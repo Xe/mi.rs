@@ -11,6 +11,8 @@ build = "src/build.rs"
 chrono = "0.4"
 color-eyre = "0.5.2"
 diesel = { version = "1.4.4", features = ["sqlite"] }
+egg-mode = "0.15.0"
+elefren = "0.22"
 hyper = "0.13"
 kankyo = "0.3"
 log = "0.4"

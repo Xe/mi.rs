@@ -2,7 +2,9 @@ let
   sources = import ./nix/sources.nix;
   pkgs =
     import sources.nixpkgs { overlays = [ (import sources.nixpkgs-mozilla) ]; };
-  ruststable = (pkgs.latest.rustChannels.stable.rust.override { extensions = [ "rust-src" "rls-preview" "rust-analysis" "rustfmt-preview" ];});
+  ruststable = (pkgs.latest.rustChannels.stable.rust.override {
+    extensions = [ "rust-src" "rls-preview" "rust-analysis" "rustfmt-preview" ];
+  });
 
 in pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -19,6 +21,6 @@ in pkgs.mkShell {
     bashInteractive
   ];
 
-  RUST_LOG="info";
-  DATABASE_URL="./mi.db";
+  DATABASE_URL = "./mi.db";
+  RUST_LOG = "info";
 }

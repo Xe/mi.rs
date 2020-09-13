@@ -11,8 +11,8 @@ use warp::Filter;
 const APPLICATION_NAME: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
 include!(concat!(env!("OUT_DIR"), "/templates.rs"));
 
-pub mod schema;
 pub mod models;
+pub mod schema;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -20,11 +20,14 @@ async fn main() -> Result<()> {
     pretty_env_logger::init();
     color_eyre::install()?;
 
-    log::info!("starting up {} commit {}", APPLICATION_NAME, env!("GITHUB_SHA"));
+    log::info!(
+        "starting up {} commit {}",
+        APPLICATION_NAME,
+        env!("GITHUB_SHA")
+    );
 
-    let database_url = std::env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&database_url)
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let connection = SqliteConnection::establish(&database_url)
         .expect(&format!("Error connecting to {}", database_url));
 
     let healthcheck = warp::get().and(warp::path(".within").and(warp::path("health")).map(|| "OK"));
@@ -48,4 +51,12 @@ async fn main() -> Result<()> {
     warp::serve(site).run(([0, 0, 0, 0], 5000)).await;
 
     Ok(())
+}
+
+fn get_members(connection: &SqliteConnection) -> Result<Vec<models::Member>> {
+    use schema::members;
+    let results = members::table
+        .load::<models::Member>(connection)?;
+
+    Ok(results)
 }

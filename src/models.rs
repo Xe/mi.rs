@@ -1,4 +1,4 @@
-#[derive(Queryable)]
+#[derive(Queryable, Debug)]
 pub struct Member {
     pub id: i32,
     pub cmene: String,

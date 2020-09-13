@@ -1,6 +1,6 @@
 table! {
     members (id) {
-        id -> Nullable<Integer>,
+        id -> Integer,
         cmene -> Text,
         picurl -> Text,
     }

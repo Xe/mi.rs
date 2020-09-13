@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS members
-  ( id INT PRIMARY KEY
+  ( id INT UNIQUE NOT NULL PRIMARY KEY
   , cmene TEXT UNIQUE NOT NULL
   , picurl TEXT UNIQUE NOT NULL
   );
