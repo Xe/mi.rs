@@ -1,21 +1,25 @@
 [package]
 name = "mi"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Christine Dodrill <me@christine.website>"]
 edition = "2018"
+build = "src/build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = "0.4"
-kankyo = "0.3"
 color-eyre = "0.5.2"
-log = "0.4"
+diesel = { version = "1.4.4", features = ["sqlite"] }
 hyper = "0.13"
+kankyo = "0.3"
+log = "0.4"
 mime = "0.3.0"
+paseto = "1.0.7"
 pretty_env_logger = "0"
 prometheus = { version = "0.10", default-features = false, features = ["process"] }
 rand = "0"
+rusty_ulid = "0.10.0"
 serde_dhall = "0.6.0"
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"

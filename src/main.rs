@@ -1,15 +1,31 @@
+#[macro_use]
+extern crate diesel;
+
 use color_eyre::eyre::Result;
+use diesel::prelude::*;
+use diesel::sqlite::SqliteConnection;
 use hyper::{header::CONTENT_TYPE, Body, Response};
 use prometheus::{Encoder, TextEncoder};
 use warp::Filter;
 
 const APPLICATION_NAME: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+include!(concat!(env!("OUT_DIR"), "/templates.rs"));
+
+pub mod schema;
+pub mod models;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let _ = kankyo::init();
     pretty_env_logger::init();
     color_eyre::install()?;
+
+    log::info!("starting up {} commit {}", APPLICATION_NAME, env!("GITHUB_SHA"));
+
+    let database_url = std::env::var("DATABASE_URL")
+        .expect("DATABASE_URL must be set");
+    SqliteConnection::establish(&database_url)
+        .expect(&format!("Error connecting to {}", database_url));
 
     let healthcheck = warp::get().and(warp::path(".within").and(warp::path("health")).map(|| "OK"));
     let metrics_endpoint = warp::path("metrics").and(warp::path::end()).map(move || {

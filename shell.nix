@@ -12,8 +12,13 @@ in pkgs.mkShell {
     cmake
     zlib
     libgit2
+    diesel-cli
+    sqlite
 
     # keep this line if you use bash
     bashInteractive
   ];
+
+  RUST_LOG="info";
+  DATABASE_URL="./mi.db";
 }
