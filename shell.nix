@@ -8,6 +8,7 @@ let
 
 in pkgs.mkShell {
   buildInputs = with pkgs; [
+    # rust
     ruststable
     pkgconfig
     openssl
@@ -16,6 +17,12 @@ in pkgs.mkShell {
     libgit2
     diesel-cli
     sqlite
+
+    # elm
+    elmPackages.elm
+    elmPackages.elm-format
+    elmPackages.elm-language-server
+    elm2nix
 
     # keep this line if you use bash
     bashInteractive
