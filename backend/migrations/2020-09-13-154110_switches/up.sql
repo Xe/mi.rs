@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS switches
   , member_id INTEGER NOT NULL
   , started_at TIMESTAMP NOT NULL
   , ended_at TIMESTAMP
-  , duration INTEGER NOT NULL
+  , duration INTEGER
   , FOREIGN KEY (member_id)
       REFERENCES members(id)
   );

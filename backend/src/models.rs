@@ -18,5 +18,20 @@ pub struct Switch {
     pub member_id: i32,
     pub started_at: NaiveDateTime,
     pub ended_at: Option<NaiveDateTime>,
-    pub duration: i32,
+    pub duration: Option<i32>,
+}
+
+#[derive(Insertable)]
+#[table_name = "switches"]
+pub struct NewSwitch {
+    pub id: String,
+    pub member_id: i32,
+    pub started_at: NaiveDateTime,
+}
+
+#[derive(AsChangeset)]
+#[table_name = "switches"]
+pub struct UpdateSwitchTime {
+    pub ended_at: Option<NaiveDateTime>,
+    pub duration: Option<i32>,
 }

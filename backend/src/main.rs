@@ -37,7 +37,7 @@ fn main() -> Result<()> {
         .attach(SpaceHelmet::default())
         .mount("/metrics", prometheus)
         .mount(
-            "/api",
+            "/",
             routes![
                 api::get_members,
                 api::get_switches,

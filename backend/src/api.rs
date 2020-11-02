@@ -1,17 +1,18 @@
 use crate::{models, schema, MainDatabase};
-use chrono::NaiveDateTime;
+use chrono::prelude::*;
 use diesel::prelude::*;
 use rocket::{
     data::{self, FromDataSimple},
-    http::{ContentType, Status},
-    request::{self, FromRequest, Request},
+    http::Status,
+    request::Request,
     response::Responder,
     Data,
     Outcome::*,
     Response,
 };
 use rocket_contrib::json::Json;
-use std::io::Read;
+use rusty_ulid::generate_ulid_string;
+use std::{convert::TryInto, io::Read};
 
 #[get("/members")]
 #[instrument(skip(conn), err)]
@@ -30,7 +31,7 @@ pub struct FrontChange {
     pub who: String, // models::Member.name
     pub started_at: NaiveDateTime,
     pub ended_at: Option<NaiveDateTime>,
-    pub duration: i32,
+    pub duration: Option<i32>,
 }
 
 #[get("/switches?<count>&<page>")]
@@ -96,18 +97,78 @@ pub fn get_current_front(conn: MainDatabase) -> Result<Json<FrontChange>> {
 
 #[post("/switches/switch", data = "<who>")]
 #[instrument(skip(conn), err)]
-pub fn make_switch(conn: MainDatabase, who: StringBody) -> Result {
-    info!("got here");
-    Ok(())
+pub fn make_switch(conn: MainDatabase, who: StringBody) -> Result<String> {
+    use schema::{members, switches};
+    let who = who.unwrap();
+
+    let (last, member): (models::Switch, models::Member) = switches::table
+        .inner_join(members::table)
+        .order_by(switches::dsl::started_at.desc())
+        .limit(1)
+        .load(&*conn)
+        .map_err(Error::Database)?
+        .pop()
+        .ok_or_else(|| Error::NotFound)?;
+
+    let to: models::Member = members::dsl::members
+        .filter({
+            use members::dsl::cmene;
+            cmene.eq(who)
+        })
+        .limit(1)
+        .load::<models::Member>(&*conn)
+        .map_err(Error::Database)?
+        .pop()
+        .ok_or_else(|| Error::NotFound)?;
+
+    let now = Utc::now().naive_utc();
+
+    let switch = models::NewSwitch {
+        id: generate_ulid_string(),
+        member_id: to.id,
+        started_at: now,
+    };
+
+    {
+        use schema::switches::dsl::*;
+        diesel::update(switches.find(last.id))
+            .set(&models::UpdateSwitchTime {
+                ended_at: Some(now.clone()),
+                duration: Some(
+                    now.clone()
+                        .signed_duration_since(last.started_at)
+                        .num_seconds()
+                        .try_into()
+                        .expect("don't expect a switch to last 30+ years"),
+                ),
+            })
+            .execute(&*conn)
+            .map_err(Error::Database)
+    }?;
+
+    diesel::insert_into(switches::table)
+        .values(&switch)
+        .execute(&*conn)
+        .map_err(Error::Database)?;
+
+    info!(from = &member.cmene[..], to = &to.cmene[..], "switched");
+
+    Ok(to.cmene)
 }
 
 #[derive(Debug)]
 pub struct StringBody(String);
 
+impl StringBody {
+    fn unwrap(self) -> String {
+        self.0
+    }
+}
+
 impl FromDataSimple for StringBody {
     type Error = String;
 
-    fn from_data(req: &Request, data: Data) -> data::Outcome<Self, String> {
+    fn from_data(_req: &Request, data: Data) -> data::Outcome<Self, String> {
         let mut contents = String::new();
 
         if let Err(e) = data.open().take(256).read_to_string(&mut contents) {
