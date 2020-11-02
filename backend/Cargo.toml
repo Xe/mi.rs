@@ -41,4 +41,3 @@ features = ["sqlite", "r2d2", "uuidv07", "chrono"]
 version = "0.4"
 default-features = false
 features = ["json", "diesel_sqlite_pool", "uuid", "helmet"]
-

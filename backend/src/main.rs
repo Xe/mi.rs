@@ -19,6 +19,7 @@ const APPLICATION_NAME: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_
 pub mod api;
 pub mod models;
 pub mod schema;
+pub mod web;
 
 #[database("main_data")]
 pub struct MainDatabase(SqliteConnection);
@@ -35,6 +36,7 @@ fn main() -> Result<()> {
         .attach(prometheus.clone())
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
+        .attach(web::switchcounter::Client::fairing())
         .mount("/metrics", prometheus)
         .mount(
             "/",
