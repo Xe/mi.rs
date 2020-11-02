@@ -156,6 +156,26 @@ pub fn make_switch(conn: MainDatabase, who: StringBody) -> Result<String> {
     Ok(to.cmene)
 }
 
+#[get("/switches/<switch_id>")]
+#[instrument(skip(conn), err)]
+pub fn get_switch(conn: MainDatabase, switch_id: String) -> Result<Json<FrontChange>> {
+    use schema::{members, switches::dsl::switches};
+
+    let (switch, member): (models::Switch, models::Member) = switches
+        .find(switch_id)
+        .inner_join(members::table)
+        .get_result(&*conn)
+        .map_err(Error::Database)?;
+
+    Ok(Json(FrontChange {
+        id: switch.id,
+        who: member.cmene,
+        started_at: switch.started_at,
+        ended_at: switch.ended_at,
+        duration: switch.duration,
+    }))
+}
+
 #[derive(Debug)]
 pub struct StringBody(String);
 

@@ -41,6 +41,7 @@ fn main() -> Result<()> {
             routes![
                 api::get_members,
                 api::get_switches,
+                api::get_switch,
                 api::get_current_front,
                 api::make_switch
             ],
