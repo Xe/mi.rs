@@ -3,32 +3,42 @@ name = "mi"
 version = "1.0.0"
 authors = ["Christine Dodrill <me@christine.website>"]
 edition = "2018"
-build = "src/build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4"
-color-eyre = "0.5.2"
-diesel = { version = "1.4.4", features = ["sqlite"] }
-egg-mode = "0.15.0"
+chrono = { version = "0.4", features = ["serde"] }
+color-eyre = "0.5"
+egg-mode = "0.15"
 elefren = "0.22"
-hyper = "0.13"
 kankyo = "0.3"
 log = "0.4"
 mime = "0.3.0"
-paseto = "1.0.7"
-pretty_env_logger = "0"
-prometheus = { version = "0.10", default-features = false, features = ["process"] }
+paseto = { version = "1.0", features = ["easy_tokens", "v2"] }
+ring = { version = "^0.16", features = ["std"] }
 rand = "0"
-rusty_ulid = "0.10.0"
-serde_dhall = "0.6.0"
+rusty_ulid = "0.10"
+serde_dhall = "0.8"
+serde_json = "^1"
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"
-tokio = { version = "0.2", features = ["macros"] }
-warp = "0.2"
+rocket = "0.4"
+tracing = "0.1"
+tracing-log = "0.1"
+tracing-subscriber = "0.2"
+ureq = { version = "1", features = ["json", "charset"] }
+uuid = { version = "0.7", features = ["serde", "v4"] }
+rocket_prometheus = "0.7.0"
+prometheus = { version = "0.10", default-features = false, features = ["process"] }
 
 jsonfeed = { git = "https://github.com/Xe/site" }
 
-[build-dependencies]
-ructe = { version = "0.12", features = ["warp02"] }
+[dependencies.diesel]
+version = "1"
+features = ["sqlite", "r2d2", "uuidv07", "chrono"]
+
+[dependencies.rocket_contrib]
+version = "0.4"
+default-features = false
+features = ["json", "diesel_sqlite_pool", "uuid", "helmet"]
+

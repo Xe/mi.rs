@@ -2,14 +2,11 @@ let
   sources = import ./nix/sources.nix;
   pkgs =
     import sources.nixpkgs { overlays = [ (import sources.nixpkgs-mozilla) ]; };
-  ruststable = (pkgs.latest.rustChannels.stable.rust.override {
-    extensions = [ "rust-src" "rls-preview" "rust-analysis" "rustfmt-preview" ];
-  });
-
-in pkgs.mkShell {
+  rust = import ./nix/rust.nix { };
+in pkgs.mkShell rec {
   buildInputs = with pkgs; [
     # rust
-    ruststable
+    rust
     pkgconfig
     openssl
     cmake
@@ -17,6 +14,7 @@ in pkgs.mkShell {
     libgit2
     diesel-cli
     sqlite
+    cargo-watch
 
     # elm
     elmPackages.elm
@@ -29,5 +27,6 @@ in pkgs.mkShell {
   ];
 
   DATABASE_URL = "./mi.db";
+  ROCKET_DATABASES = ''{ main_data = { url = "${DATABASE_URL}" } }'';
   RUST_LOG = "info";
 }

@@ -1,15 +1,22 @@
-#[derive(Queryable, Debug)]
+use crate::schema::*;
+use chrono::NaiveDateTime;
+use serde::Serialize;
+
+#[derive(Queryable, Debug, Serialize)]
 pub struct Member {
     pub id: i32,
+    #[serde(rename = "name")]
     pub cmene: String,
     pub picurl: String,
 }
 
-#[derive(Queryable)]
+#[derive(Queryable, Associations)]
+#[belongs_to(Member)]
+#[table_name = "switches"]
 pub struct Switch {
     pub id: String,
-    pub who: String,
-    pub started_at: String,
-    pub ended_at: Option<String>,
-    pub duration: String,
+    pub member_id: i32,
+    pub started_at: NaiveDateTime,
+    pub ended_at: Option<NaiveDateTime>,
+    pub duration: i32,
 }
