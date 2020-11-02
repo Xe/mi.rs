@@ -1,4 +1,4 @@
-use crate::{models, schema, MainDatabase};
+use crate::{models, schema, web, MainDatabase};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use rocket::{
@@ -8,7 +8,7 @@ use rocket::{
     response::Responder,
     Data,
     Outcome::*,
-    Response,
+    Response, State,
 };
 use rocket_contrib::json::Json;
 use rusty_ulid::generate_ulid_string;
@@ -96,8 +96,13 @@ pub fn get_current_front(conn: MainDatabase) -> Result<Json<FrontChange>> {
 }
 
 #[post("/switches/switch", data = "<who>")]
-#[instrument(skip(conn), err)]
-pub fn make_switch(conn: MainDatabase, who: StringBody) -> Result<String> {
+#[instrument(skip(conn, sc, pk), err)]
+pub fn make_switch(
+    conn: MainDatabase,
+    who: StringBody,
+    sc: State<web::switchcounter::Client>,
+    pk: State<web::pluralkit::Client>,
+) -> Result<String> {
     use schema::{members, switches};
     let who = who.unwrap();
 
@@ -153,6 +158,9 @@ pub fn make_switch(conn: MainDatabase, who: StringBody) -> Result<String> {
 
     info!(from = &member.cmene[..], to = &to.cmene[..], "switched");
 
+    sc.switch(to.cmene.clone())?;
+    pk.switch(to.cmene.clone())?;
+
     Ok(to.cmene)
 }
 
@@ -206,6 +214,9 @@ pub enum Error {
 
     #[error("not found")]
     NotFound,
+
+    #[error("web API interop error: {0}")]
+    Web(#[from] web::Error),
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;

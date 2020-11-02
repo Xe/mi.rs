@@ -36,6 +36,7 @@ fn main() -> Result<()> {
         .attach(prometheus.clone())
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
+        .attach(web::pluralkit::Client::fairing())
         .attach(web::switchcounter::Client::fairing())
         .mount("/metrics", prometheus)
         .mount(

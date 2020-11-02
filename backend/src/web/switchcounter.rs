@@ -1,4 +1,4 @@
-use color_eyre::eyre::{eyre, Result};
+use super::{Error, Result};
 use rocket::fairing::AdHoc;
 use serde::{Deserialize, Serialize};
 
@@ -52,7 +52,10 @@ impl Client {
         if resp.ok() {
             Ok(resp.into_json_deserialize()?)
         } else {
-            Err(eyre!("{}", resp.status_line()))
+            Err(match resp.synthetic_error() {
+                Some(why) => Error::UReq(why.to_string()),
+                None => Error::HttpStatus(resp.status()),
+            })
         }
     }
 
@@ -66,7 +69,10 @@ impl Client {
         if resp.ok() {
             Ok(resp.into_json_deserialize()?)
         } else {
-            Err(eyre!("{}", resp.status_line()))
+            Err(match resp.synthetic_error() {
+                Some(why) => Error::UReq(why.to_string()),
+                None => Error::HttpStatus(resp.status()),
+            })
         }
     }
 }
