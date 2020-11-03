@@ -12,7 +12,6 @@ table! {
         member_id -> Integer,
         started_at -> Timestamp,
         ended_at -> Nullable<Timestamp>,
-        duration -> Nullable<Integer>,
     }
 }
 

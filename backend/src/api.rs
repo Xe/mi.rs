@@ -12,7 +12,7 @@ use rocket::{
 };
 use rocket_contrib::json::Json;
 use rusty_ulid::generate_ulid_string;
-use std::{convert::TryInto, io::Read};
+use std::io::Read;
 
 #[get("/members")]
 #[instrument(skip(conn), err)]
@@ -56,12 +56,12 @@ pub fn get_switches(
         .load::<(models::Switch, models::Member)>(&*conn)
         .map_err(Error::Database)?
         .into_iter()
-        .map(|front| FrontChange {
-            id: front.0.id,
-            who: front.1.cmene,
-            started_at: front.0.started_at,
-            ended_at: front.0.ended_at,
-            duration: front.0.duration,
+        .map(|(switch, member)| FrontChange {
+            duration: switch.duration(),
+            id: switch.id,
+            who: member.cmene,
+            started_at: switch.started_at,
+            ended_at: switch.ended_at,
         })
         .collect();
 
@@ -84,12 +84,12 @@ pub fn get_current_front(conn: MainDatabase) -> Result<Json<FrontChange>> {
         .map_err(Error::Database)?;
 
     match front.pop() {
-        Some(front) => Ok(Json(FrontChange {
-            id: front.0.id,
-            who: front.1.cmene,
-            started_at: front.0.started_at,
-            ended_at: front.0.ended_at,
-            duration: front.0.duration,
+        Some((switch, member)) => Ok(Json(FrontChange {
+            duration: switch.duration(),
+            id: switch.id,
+            who: member.cmene,
+            started_at: switch.started_at,
+            ended_at: switch.ended_at,
         })),
         None => Err(Error::NotFound),
     }
@@ -139,13 +139,6 @@ pub fn make_switch(
         diesel::update(switches.find(last.id))
             .set(&models::UpdateSwitchTime {
                 ended_at: Some(now.clone()),
-                duration: Some(
-                    now.clone()
-                        .signed_duration_since(last.started_at)
-                        .num_seconds()
-                        .try_into()
-                        .expect("don't expect a switch to last 30+ years"),
-                ),
             })
             .execute(&*conn)
             .map_err(Error::Database)
@@ -176,11 +169,11 @@ pub fn get_switch(conn: MainDatabase, switch_id: String) -> Result<Json<FrontCha
         .map_err(Error::Database)?;
 
     Ok(Json(FrontChange {
+        duration: switch.duration(),
         id: switch.id,
         who: member.cmene,
         started_at: switch.started_at,
         ended_at: switch.ended_at,
-        duration: switch.duration,
     }))
 }
 

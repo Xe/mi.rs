@@ -1,6 +1,7 @@
 use crate::schema::*;
 use chrono::NaiveDateTime;
 use serde::Serialize;
+use std::convert::TryInto;
 
 #[derive(Queryable, Debug, Serialize)]
 pub struct Member {
@@ -10,7 +11,7 @@ pub struct Member {
     pub picurl: String,
 }
 
-#[derive(Queryable, Associations)]
+#[derive(Queryable, Associations, Insertable)]
 #[belongs_to(Member)]
 #[table_name = "switches"]
 pub struct Switch {
@@ -18,7 +19,22 @@ pub struct Switch {
     pub member_id: i32,
     pub started_at: NaiveDateTime,
     pub ended_at: Option<NaiveDateTime>,
-    pub duration: Option<i32>,
+}
+
+impl Switch {
+    pub fn duration(&self) -> Option<i32> {
+        match self.ended_at {
+            None => None,
+            Some(end_time) => Some(
+                end_time
+                    .clone()
+                    .signed_duration_since(self.started_at)
+                    .num_seconds()
+                    .try_into()
+                    .expect("don't expect a switch to last 30+ years"),
+            ),
+        }
+    }
 }
 
 #[derive(Insertable)]
@@ -33,5 +49,4 @@ pub struct NewSwitch {
 #[table_name = "switches"]
 pub struct UpdateSwitchTime {
     pub ended_at: Option<NaiveDateTime>,
-    pub duration: Option<i32>,
 }
