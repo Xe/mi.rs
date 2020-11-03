@@ -30,6 +30,7 @@ uuid = { version = "0.7", features = ["serde", "v4"] }
 rocket_prometheus = "0.7.0"
 prometheus = { version = "0.10", default-features = false, features = ["process"] }
 futures-io = "0.3"
+hex = "0.4"
 
 jsonfeed = { git = "https://github.com/Xe/site" }
 

@@ -1,4 +1,4 @@
-use crate::{models, schema, web, MainDatabase};
+use crate::{models, paseto, schema, web, MainDatabase};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use rocket::{
@@ -16,7 +16,7 @@ use std::io::Read;
 
 #[get("/members")]
 #[instrument(skip(conn), err)]
-pub fn get_members(conn: MainDatabase) -> Result<Json<Vec<models::Member>>> {
+pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<models::Member>>> {
     use schema::members;
     let results = members::table
         .load::<models::Member>(&*conn)
@@ -40,6 +40,7 @@ pub fn get_switches(
     conn: MainDatabase,
     count: Option<i64>,
     page: Option<i64>,
+    tok: paseto::Token,
 ) -> Result<Json<Vec<FrontChange>>> {
     use schema::{members, switches};
 
@@ -73,7 +74,7 @@ pub fn get_switches(
 
 #[get("/switches/current")]
 #[instrument(skip(conn), err)]
-pub fn get_current_front(conn: MainDatabase) -> Result<Json<FrontChange>> {
+pub fn get_current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<FrontChange>> {
     use schema::{members, switches};
 
     let mut front: Vec<(models::Switch, models::Member)> = switches::table
@@ -102,6 +103,7 @@ pub fn make_switch(
     who: StringBody,
     sc: State<web::switchcounter::Client>,
     pk: State<web::pluralkit::Client>,
+    tok: paseto::Token,
 ) -> Result<String> {
     use schema::{members, switches};
     let who = who.unwrap();
@@ -159,7 +161,11 @@ pub fn make_switch(
 
 #[get("/switches/<switch_id>")]
 #[instrument(skip(conn), err)]
-pub fn get_switch(conn: MainDatabase, switch_id: String) -> Result<Json<FrontChange>> {
+pub fn get_switch(
+    tok: paseto::Token,
+    conn: MainDatabase,
+    switch_id: String,
+) -> Result<Json<FrontChange>> {
     use schema::{members, switches::dsl::switches};
 
     let (switch, member): (models::Switch, models::Member) = switches

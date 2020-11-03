@@ -1608,6 +1608,7 @@ dependencies = [
  "egg-mode",
  "elefren",
  "futures-io",
+ "hex",
  "jsonfeed",
  "kankyo",
  "log 0.4.11",

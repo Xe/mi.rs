@@ -9,7 +9,7 @@ use color_eyre::eyre::Result;
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_prometheus::PrometheusMetrics;
 
-use ::mi::{api, web, MainDatabase, APPLICATION_NAME};
+use ::mi::{api, paseto, web, MainDatabase, APPLICATION_NAME};
 
 #[get("/.within/botinfo")]
 fn botinfo() -> &'static str {
@@ -42,13 +42,14 @@ fn main() -> Result<()> {
         .attach(prometheus.clone())
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
+        .attach(paseto::ed25519_keypair())
         .attach(web::pluralkit::Client::fairing())
         .attach(web::switchcounter::Client::fairing())
         .mount("/metrics", prometheus)
+        .mount("/", routes![botinfo])
         .mount(
-            "/",
+            "/api",
             routes![
-                botinfo,
                 api::get_members,
                 api::get_switches,
                 api::get_switch,
