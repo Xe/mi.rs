@@ -11,6 +11,25 @@ use rocket_prometheus::PrometheusMetrics;
 
 use ::mi::{api, web, MainDatabase, APPLICATION_NAME};
 
+#[get("/.within/botinfo")]
+fn botinfo() -> &'static str {
+    r#"Hello, if you are reading this, you have found this URL in your
+access logs. If this program is doing something you don't want it to do,
+please contact me at me@christine.website.
+
+This service is intended to act as a POSSE[1] syndication server for
+various services to various other services.
+
+Every effort is being taken to ensure that the data going through this
+server is my own.
+
+I'm sorry if this causes you any inconvenience.
+
+[1]: https://indieweb.org/POSSE
+
+Be well, Creator."#
+}
+
 fn main() -> Result<()> {
     let _ = kankyo::init();
     color_eyre::install()?;
@@ -29,6 +48,7 @@ fn main() -> Result<()> {
         .mount(
             "/",
             routes![
+                botinfo,
                 api::get_members,
                 api::get_switches,
                 api::get_switch,
