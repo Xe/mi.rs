@@ -6,7 +6,9 @@ extern crate rocket;
 extern crate tracing;
 
 use color_eyre::eyre::Result;
+use rocket::http::Method;
 use rocket_contrib::helmet::SpaceHelmet;
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use rocket_prometheus::PrometheusMetrics;
 
 use ::mi::{api, paseto, web::*, MainDatabase, APPLICATION_NAME};
@@ -37,9 +39,26 @@ fn main() -> Result<()> {
 
     info!("{} starting up", APPLICATION_NAME);
 
+    let allowed_origins =
+        AllowedOrigins::some_exact(&["https://mi.within.website", "http://localhost:8000"]);
+
+    // You can also deserialize this
+    let cors = rocket_cors::CorsOptions {
+        allowed_origins,
+        allowed_methods: vec![Method::Get, Method::Post]
+            .into_iter()
+            .map(From::from)
+            .collect(),
+        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept"]),
+        allow_credentials: true,
+        ..Default::default()
+    }
+    .to_cors()?;
+
     let prometheus = PrometheusMetrics::with_registry(prometheus::default_registry().clone());
     rocket::ignite()
         .attach(prometheus.clone())
+        .attach(cors)
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
         .attach(paseto::ed25519_keypair())
