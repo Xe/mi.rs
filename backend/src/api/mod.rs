@@ -13,6 +13,7 @@ use rocket_contrib::json::Json;
 use std::io::Read;
 
 pub mod switch;
+pub mod webmention;
 
 #[get("/members")]
 #[instrument(skip(conn), err)]
@@ -79,6 +80,12 @@ pub enum Error {
 
     #[error("web API interop error: {0}")]
     Web(#[from] web::Error),
+
+    #[error("URL parsing error: {0}")]
+    URL(#[from] url::ParseError),
+
+    #[error("invalid webmention: {0}")]
+    InvalidWebMention(String),
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;
@@ -88,6 +95,7 @@ impl<'a> Responder<'a> for Error {
         error!("{}", self);
         match self {
             Error::NotFound => Err(Status::NotFound),
+            Error::InvalidWebMention(_) => Err(Status::BadRequest),
             _ => Err(Status::InternalServerError),
         }
     }

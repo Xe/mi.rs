@@ -57,6 +57,8 @@ fn main() -> Result<()> {
                 api::switch::get,
                 api::switch::list,
                 api::switch::switch,
+                api::webmention::accept,
+                api::webmention::get,
                 api::get_members,
                 api::token_info,
                 api::tweet,

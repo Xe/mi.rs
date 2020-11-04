@@ -50,3 +50,11 @@ pub struct NewSwitch {
 pub struct UpdateSwitchTime {
     pub ended_at: Option<NaiveDateTime>,
 }
+
+#[derive(Queryable, Associations, Insertable, Serialize)]
+#[table_name = "webmentions"]
+pub struct WebMention {
+    pub id: String,
+    pub source_url: String,
+    pub target_url: String,
+}

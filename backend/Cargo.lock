@@ -1033,6 +1033,7 @@ dependencies = [
  "tracing-subscriber",
  "twapi-ureq",
  "ureq",
+ "url 2.1.1",
  "uuid",
 ]
 
