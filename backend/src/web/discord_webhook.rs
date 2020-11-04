@@ -43,6 +43,7 @@ impl Client {
         })
     }
 
+    #[instrument(skip(self), err)]
     pub fn send(&self, body: String) -> Result<()> {
         let resp = ureq::post(&self.webhook_url)
             .set("User-Agent", crate::APPLICATION_NAME)

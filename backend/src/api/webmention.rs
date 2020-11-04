@@ -1,10 +1,10 @@
 use super::{Error, Result};
-use crate::{models, schema, MainDatabase};
+use crate::{models, schema, web::discord_webhook::Client as DiscordWebhook, MainDatabase};
 use diesel::prelude::*;
 use rocket::{
     request::Form,
     response::{self, Responder},
-    Request, Response,
+    Request, Response, State,
 };
 use rocket_contrib::json::Json;
 use rusty_ulid::generate_ulid_string;
@@ -71,8 +71,12 @@ impl<'a> Responder<'a> for models::WebMention {
 }
 
 #[post("/webmention/accept", data = "<mention>")]
-#[instrument(skip(conn, mention), err)]
-pub fn accept(conn: MainDatabase, mention: Form<WebMention>) -> Result<models::WebMention> {
+#[instrument(skip(conn, mention, dw), err)]
+pub fn accept(
+    conn: MainDatabase,
+    mention: Form<WebMention>,
+    dw: State<DiscordWebhook>,
+) -> Result<models::WebMention> {
     use schema::webmentions;
 
     let mention = mention.into_inner();
@@ -89,6 +93,15 @@ pub fn accept(conn: MainDatabase, mention: Form<WebMention>) -> Result<models::W
         .values(&wm)
         .execute(&*conn)
         .map_err(Error::Database)?;
+
+    dw.send(format!(
+        "<{}> mentioned <{}> (<https://mi.within.website/api/webmention/{}>)",
+        wm.source_url, wm.target_url, wm.id
+    ))
+    .map_err(|why| {
+        error!("webhook send failed: {}", why);
+        Error::Web(why)
+    })?;
 
     Ok(wm)
 }
