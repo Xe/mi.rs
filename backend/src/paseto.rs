@@ -31,19 +31,18 @@ pub fn ed25519_keypair() -> AdHoc {
             .unwrap();
         debug!("token: {}", token);
 
-        Ok(rocket
-            .manage(Ed25519KeyPair::from_seed_and_public_key(&private, &public).unwrap())
-            .manage(PasetoPublicKey::ED25519KeyPair(
-                Ed25519KeyPair::from_seed_and_public_key(&private, &public).unwrap(),
-            )))
+        Ok(rocket.manage(PasetoPublicKey::ED25519KeyPair(
+            Ed25519KeyPair::from_seed_and_public_key(&private, &public).unwrap(),
+        )))
     })
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Token {
     pub jti: String,
     pub sub: String,
     pub aud: String,
+    pub iss: String,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for Token {
@@ -59,6 +58,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Token {
                 match validate_public_token(tok, None, &paseto_key) {
                     Ok(val) => {
                         let tok: Token = serde_json::from_value(val).unwrap();
+                        info!(id = &tok.jti[..], "token used");
                         Outcome::Success(tok)
                     }
                     Err(why) => {

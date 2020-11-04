@@ -54,7 +54,8 @@ fn main() -> Result<()> {
                 api::get_switches,
                 api::get_switch,
                 api::get_current_front,
-                api::make_switch
+                api::make_switch,
+                api::token_info
             ],
         )
         .launch();

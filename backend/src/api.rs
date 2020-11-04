@@ -25,6 +25,11 @@ pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<mo
     Ok(Json(results))
 }
 
+#[get("/token/info")]
+pub fn token_info(tok: paseto::Token) -> Json<paseto::Token> {
+    Json(tok)
+}
+
 #[derive(serde::Serialize)]
 pub struct FrontChange {
     pub id: String,
