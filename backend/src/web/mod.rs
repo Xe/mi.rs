@@ -4,6 +4,12 @@ pub mod pluralkit;
 pub mod switchcounter;
 pub mod twitter;
 
+pub use discord_webhook::Client as DiscordWebhook;
+pub use mastodon::Client as Mastodon;
+pub use pluralkit::Client as PluralKit;
+pub use switchcounter::Client as SwitchCounter;
+pub use twitter::Client as Twitter;
+
 pub type Result<T = ()> = std::result::Result<T, Error>;
 
 #[derive(thiserror::Error, Debug)]

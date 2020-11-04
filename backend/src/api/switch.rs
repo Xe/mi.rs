@@ -1,5 +1,9 @@
 use super::{Error, Result, StringBody};
-use crate::{models, paseto, schema, web, MainDatabase};
+use crate::{
+    models, paseto, schema,
+    web::{PluralKit, SwitchCounter},
+    MainDatabase,
+};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use rocket::State;
@@ -82,8 +86,8 @@ pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<Fron
 pub fn switch(
     conn: MainDatabase,
     who: StringBody,
-    sc: State<web::switchcounter::Client>,
-    pk: State<web::pluralkit::Client>,
+    sc: State<SwitchCounter>,
+    pk: State<PluralKit>,
     tok: paseto::Token,
 ) -> Result<String> {
     use schema::{members, switches};
