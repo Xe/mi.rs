@@ -11,9 +11,9 @@ in pkgs.mkShell rec {
     openssl
     cmake
     zlib
-    libgit2
     diesel-cli
     sqlite
+    libsodium
     cargo-watch
 
     # elm
@@ -29,4 +29,8 @@ in pkgs.mkShell rec {
   DATABASE_URL = "./mi.db";
   ROCKET_DATABASES = ''{ main_data = { url = "${DATABASE_URL}" } }'';
   RUST_LOG = "info";
+
+  # libsodium-sys
+  SODIUM_USE_PKG_CONFIG = "1";
+  SODIUM_SHARED = "1";
 }
