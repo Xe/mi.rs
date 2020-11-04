@@ -1,4 +1,16 @@
 {
+    "gruvbox-css": {
+        "branch": "master",
+        "description": "My minimal Gruvbox CSS file I've been keeping multiple places",
+        "homepage": null,
+        "owner": "Xe",
+        "repo": "gruvbox-css",
+        "rev": "6e1841c94190a1e06e63a2596767e66c35671320",
+        "sha256": "0s7whnin63558i70wp3by3rydsdx0qdzh5553km1s29w81npmgj6",
+        "type": "tarball",
+        "url": "https://github.com/Xe/gruvbox-css/archive/6e1841c94190a1e06e63a2596767e66c35671320.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "naersk": {
         "branch": "master",
         "description": "Build rust crates in Nix. No configuration, no code generation, no IFD. Sandbox friendly.",
