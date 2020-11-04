@@ -45,16 +45,17 @@ fn main() -> Result<()> {
         .attach(paseto::ed25519_keypair())
         .attach(web::pluralkit::Client::fairing())
         .attach(web::switchcounter::Client::fairing())
+        .attach(web::discord_webhook::Client::fairing())
         .mount("/metrics", prometheus)
         .mount("/", routes![botinfo])
         .mount(
             "/api",
             routes![
+                api::switch::current_front,
+                api::switch::get,
+                api::switch::list,
+                api::switch::switch,
                 api::get_members,
-                api::get_switches,
-                api::get_switch,
-                api::get_current_front,
-                api::make_switch,
                 api::token_info
             ],
         )

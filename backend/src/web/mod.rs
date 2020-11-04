@@ -1,3 +1,4 @@
+pub mod discord_webhook;
 pub mod pluralkit;
 pub mod switchcounter;
 

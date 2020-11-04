@@ -1,34 +1,10 @@
+use super::{Error, Result, StringBody};
 use crate::{models, paseto, schema, web, MainDatabase};
 use chrono::prelude::*;
 use diesel::prelude::*;
-use rocket::{
-    data::{self, FromDataSimple},
-    http::Status,
-    request::Request,
-    response::Responder,
-    Data,
-    Outcome::*,
-    Response, State,
-};
+use rocket::State;
 use rocket_contrib::json::Json;
 use rusty_ulid::generate_ulid_string;
-use std::io::Read;
-
-#[get("/members")]
-#[instrument(skip(conn), err)]
-pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<models::Member>>> {
-    use schema::members;
-    let results = members::table
-        .load::<models::Member>(&*conn)
-        .map_err(Error::Database)?;
-
-    Ok(Json(results))
-}
-
-#[get("/token/info")]
-pub fn token_info(tok: paseto::Token) -> Json<paseto::Token> {
-    Json(tok)
-}
 
 #[derive(serde::Serialize)]
 pub struct FrontChange {
@@ -41,7 +17,7 @@ pub struct FrontChange {
 
 #[get("/switches?<count>&<page>")]
 #[instrument(skip(conn), err)]
-pub fn get_switches(
+pub fn list(
     conn: MainDatabase,
     count: Option<i64>,
     page: Option<i64>,
@@ -49,7 +25,7 @@ pub fn get_switches(
 ) -> Result<Json<Vec<FrontChange>>> {
     use schema::{members, switches};
 
-    let count = count.unwrap_or(50);
+    let count = count.unwrap_or(30);
     let page = page.unwrap_or(0);
 
     let count = if count < 100 { count } else { 100 };
@@ -79,7 +55,7 @@ pub fn get_switches(
 
 #[get("/switches/current")]
 #[instrument(skip(conn), err)]
-pub fn get_current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<FrontChange>> {
+pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<FrontChange>> {
     use schema::{members, switches};
 
     let mut front: Vec<(models::Switch, models::Member)> = switches::table
@@ -103,7 +79,7 @@ pub fn get_current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<
 
 #[post("/switches/switch", data = "<who>")]
 #[instrument(skip(conn, sc, pk), err)]
-pub fn make_switch(
+pub fn switch(
     conn: MainDatabase,
     who: StringBody,
     sc: State<web::switchcounter::Client>,
@@ -166,11 +142,7 @@ pub fn make_switch(
 
 #[get("/switches/<switch_id>")]
 #[instrument(skip(conn), err)]
-pub fn get_switch(
-    tok: paseto::Token,
-    conn: MainDatabase,
-    switch_id: String,
-) -> Result<Json<FrontChange>> {
+pub fn get(tok: paseto::Token, conn: MainDatabase, switch_id: String) -> Result<Json<FrontChange>> {
     use schema::{members, switches::dsl::switches};
 
     let (switch, member): (models::Switch, models::Member) = switches
@@ -186,51 +158,4 @@ pub fn get_switch(
         started_at: switch.started_at,
         ended_at: switch.ended_at,
     }))
-}
-
-#[derive(Debug)]
-pub struct StringBody(String);
-
-impl StringBody {
-    fn unwrap(self) -> String {
-        self.0
-    }
-}
-
-impl FromDataSimple for StringBody {
-    type Error = String;
-
-    fn from_data(_req: &Request, data: Data) -> data::Outcome<Self, String> {
-        let mut contents = String::new();
-
-        if let Err(e) = data.open().take(256).read_to_string(&mut contents) {
-            return Failure((Status::InternalServerError, format!("{:?}", e)));
-        }
-
-        Success(StringBody(contents))
-    }
-}
-
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    #[error("internal database error: {0}")]
-    Database(#[from] diesel::result::Error),
-
-    #[error("not found")]
-    NotFound,
-
-    #[error("web API interop error: {0}")]
-    Web(#[from] web::Error),
-}
-
-pub type Result<T = ()> = std::result::Result<T, Error>;
-
-impl<'a> Responder<'a> for Error {
-    fn respond_to(self, _: &Request) -> ::std::result::Result<Response<'a>, Status> {
-        error!("{}", self);
-        match self {
-            Error::NotFound => Err(Status::NotFound),
-            _ => Err(Status::InternalServerError),
-        }
-    }
 }

@@ -1,0 +1,42 @@
+# This is all the config you need for this service
+[global]
+address = "0.0.0.0"
+switchcounter_webhook = "..."
+discord_webhook = ""
+
+# I don't know how to generate these without using Go, sorry. These are hex-encoded
+# ED25519 public/private keys.
+[global.paseto]
+public =  ""
+private = ""
+
+# fetch this from PluralKit directly
+[global.pluralkit]
+system_id = ""
+token = ""
+
+# fetch these from Pluralkit directly
+[global.pluralkit.mappings]
+
+# why the fuck does twitter need 4 goddamn API keys holy shit
+[global.twitter]
+consumer_token = "..."
+consumer_secret = "..."
+api_key = "..."
+api_secret = "..."
+
+# This MIGHT work with pleroma, godspeed. Fetch these values from
+# the API.
+[global.mastodon]
+instance = "..."
+app_id = "..."
+app_secret = "..."
+token = "..."
+account = "..."
+
+# Get these values by creating an oAuth app
+[global.reddit]
+app_id = "..."
+app_secret = "..."
+username = "..."
+password = "..."
