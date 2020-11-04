@@ -1,4 +1,11 @@
 table! {
+    blogposts (url) {
+        url -> Binary,
+        title -> Text,
+    }
+}
+
+table! {
     members (id) {
         id -> Integer,
         cmene -> Text,
@@ -26,6 +33,7 @@ table! {
 joinable!(switches -> members (member_id));
 
 allow_tables_to_appear_in_same_query!(
+    blogposts,
     members,
     switches,
     webmentions,

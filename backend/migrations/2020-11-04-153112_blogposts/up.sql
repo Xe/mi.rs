@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS blogposts
+  ( url UNIQUE NOT NULL PRIMARY KEY
+  , title TEXT NOT NULL
+  )
