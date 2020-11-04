@@ -1,6 +1,7 @@
 pub mod discord_webhook;
 pub mod pluralkit;
 pub mod switchcounter;
+pub mod twitter;
 
 pub type Result<T = ()> = std::result::Result<T, Error>;
 

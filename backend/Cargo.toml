@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 color-eyre = "0.5"
-egg-mode = "0.15"
+twapi-ureq = "0.1.5"
 elefren = "0.22"
 kankyo = "0.3"
 log = "0.4"

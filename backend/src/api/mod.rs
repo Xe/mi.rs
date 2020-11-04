@@ -7,7 +7,7 @@ use rocket::{
     response::Responder,
     Data,
     Outcome::*,
-    Response,
+    Response, State,
 };
 use rocket_contrib::json::Json;
 use std::io::Read;
@@ -28,6 +28,14 @@ pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<mo
 #[get("/token/info")]
 pub fn token_info(tok: paseto::Token) -> Json<paseto::Token> {
     Json(tok)
+}
+
+#[post("/tweet", data = "<body>")]
+#[instrument(skip(tw), err)]
+pub fn tweet(body: StringBody, tw: State<web::twitter::Client>, tok: paseto::Token) -> Result {
+    tw.tweet(body.unwrap())?;
+
+    Ok(())
 }
 
 #[derive(Debug)]

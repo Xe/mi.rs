@@ -43,9 +43,10 @@ fn main() -> Result<()> {
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
         .attach(paseto::ed25519_keypair())
+        .attach(web::discord_webhook::Client::fairing())
         .attach(web::pluralkit::Client::fairing())
         .attach(web::switchcounter::Client::fairing())
-        .attach(web::discord_webhook::Client::fairing())
+        .attach(web::twitter::Client::fairing())
         .mount("/metrics", prometheus)
         .mount("/", routes![botinfo])
         .mount(
@@ -56,7 +57,8 @@ fn main() -> Result<()> {
                 api::switch::list,
                 api::switch::switch,
                 api::get_members,
-                api::token_info
+                api::token_info,
+                api::tweet,
             ],
         )
         .launch();
