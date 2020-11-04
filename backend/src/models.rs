@@ -58,3 +58,10 @@ pub struct WebMention {
     pub source_url: String,
     pub target_url: String,
 }
+
+#[derive(Queryable, Associations, Insertable)]
+#[table_name = "blogposts"]
+pub struct Blogpost {
+    pub url: String,
+    pub title: String,
+}

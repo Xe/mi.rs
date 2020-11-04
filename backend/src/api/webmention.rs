@@ -1,5 +1,5 @@
 use super::{Error, Result};
-use crate::{models, schema, web::discord_webhook::Client as DiscordWebhook, MainDatabase};
+use crate::{models, paseto, schema, web::discord_webhook::Client as DiscordWebhook, MainDatabase};
 use diesel::prelude::*;
 use rocket::{
     request::Form,
@@ -115,6 +115,30 @@ pub fn get(conn: MainDatabase, mention_id: String) -> Result<Json<models::WebMen
         webmentions
             .find(mention_id)
             .get_result(&*conn)
+            .map_err(Error::Database)?,
+    ))
+}
+
+#[get("/webmention?<count>&<page>")]
+#[instrument(skip(conn), err)]
+pub fn list(
+    conn: MainDatabase,
+    count: Option<i64>,
+    page: Option<i64>,
+    tok: paseto::Token,
+) -> Result<Json<Vec<models::WebMention>>> {
+    use schema::webmentions;
+
+    let count = count.unwrap_or(30);
+    let page = page.unwrap_or(0);
+
+    let count = if count < 100 { count } else { 100 };
+
+    Ok(Json(
+        webmentions::table
+            .limit(count)
+            .offset(count * (page - 1))
+            .load::<models::WebMention>(&*conn)
             .map_err(Error::Database)?,
     ))
 }

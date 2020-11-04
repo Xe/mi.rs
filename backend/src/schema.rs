@@ -1,6 +1,6 @@
 table! {
     blogposts (url) {
-        url -> Binary,
+        url -> Text,
         title -> Text,
     }
 }

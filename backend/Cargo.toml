@@ -32,8 +32,6 @@ ureq = { version = "1", features = ["json", "charset"] }
 uuid = { version = "0.7", features = ["serde", "v4"] }
 url = "2"
 
-jsonfeed = { git = "https://github.com/Xe/site" }
-
 [dependencies.diesel]
 version = "1"
 features = ["sqlite", "r2d2", "uuidv07", "chrono"]

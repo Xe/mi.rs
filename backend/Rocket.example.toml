@@ -31,10 +31,3 @@ api_secret = "..."
 instance = "..."
 token = "..."
 account = "..."
-
-# Get these values by creating an oAuth app
-[global.reddit]
-app_id = "..."
-app_secret = "..."
-username = "..."
-password = "..."
