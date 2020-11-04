@@ -6,6 +6,7 @@ use crate::{
 };
 use diesel::prelude::*;
 use rocket::State;
+use rocket_contrib::json::Json;
 use serde::Deserialize;
 use std::fmt::Write;
 
@@ -77,6 +78,20 @@ fn posse(item: Item, dw: &DiscordWebhook, tw: &Twitter, ma: &Mastodon) -> WebRes
 }
 
 pub static BLOG_FEED_URL: &'static str = "https://christine.website/blog.json";
+
+#[post("/posse", format = "json", data = "<item>")]
+#[instrument(skip(dw, tw, ma), err)]
+pub fn notify(
+    item: Json<Item>,
+    tok: paseto::Token,
+    dw: State<DiscordWebhook>,
+    tw: State<Twitter>,
+    ma: State<Mastodon>,
+) -> Result {
+    posse(item.into_inner(), &dw, &tw, &ma)?;
+
+    Ok(())
+}
 
 #[post("/blog/refresh")]
 #[instrument(skip(conn, dw, tw, ma), err)]

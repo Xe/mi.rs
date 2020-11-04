@@ -81,6 +81,24 @@ pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<Fron
     }
 }
 
+#[get("/switches/current/text")]
+#[instrument(skip(conn), err)]
+pub fn current_front_text(conn: MainDatabase, tok: paseto::Token) -> Result<String> {
+    use schema::{members, switches};
+
+    let mut front: Vec<(models::Switch, models::Member)> = switches::table
+        .inner_join(members::table)
+        .order_by(switches::dsl::started_at.desc())
+        .limit(1)
+        .load(&*conn)
+        .map_err(Error::Database)?;
+
+    match front.pop() {
+        Some((_, member)) => Ok(member.cmene),
+        None => Err(Error::NotFound),
+    }
+}
+
 #[post("/switches/switch", data = "<who>")]
 #[instrument(skip(conn, sc, pk), err)]
 pub fn switch(

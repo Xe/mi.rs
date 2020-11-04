@@ -53,8 +53,10 @@ fn main() -> Result<()> {
         .mount(
             "/api",
             routes![
+                api::posse::notify,
                 api::posse::refresh_blog,
                 api::switch::current_front,
+                api::switch::current_front_text,
                 api::switch::get,
                 api::switch::list,
                 api::switch::switch,
