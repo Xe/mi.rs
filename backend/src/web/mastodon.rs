@@ -3,8 +3,6 @@ use rocket::fairing::AdHoc;
 
 pub struct Client {
     instance_url: String,
-    app_id: String,
-    app_secret: String,
     token: String,
     account_name: String,
 }
@@ -15,15 +13,11 @@ impl Client {
             let cfg = rocket.config();
             let table = cfg.get_table("mastodon").unwrap();
             let instance_url = table["instance"].as_str().unwrap().to_string();
-            let app_id = table["app_id"].as_str().unwrap().to_string();
-            let app_secret = table["app_secret"].as_str().unwrap().to_string();
             let token = table["token"].as_str().unwrap().to_string();
             let account_name = table["account"].as_str().unwrap().to_string();
 
             let cli = Client {
                 instance_url: instance_url,
-                app_id: app_id,
-                app_secret: app_secret,
                 token: token,
                 account_name: account_name,
             };
@@ -41,6 +35,7 @@ impl Client {
 
         let resp = ureq::post(url)
             .set("Authorization", &format!("bearer {}", self.token))
+            .set("User-Agent", crate::APPLICATION_NAME)
             .send_form(&[("status", body.as_str())]);
 
         if resp.ok() {

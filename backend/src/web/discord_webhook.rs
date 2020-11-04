@@ -44,7 +44,9 @@ impl Client {
     }
 
     pub fn send(&self, body: String) -> Result<()> {
-        let resp = ureq::post(&self.webhook_url).send_json(serde_json::to_value(Body::new(body))?);
+        let resp = ureq::post(&self.webhook_url)
+            .set("User-Agent", crate::APPLICATION_NAME)
+            .send_json(serde_json::to_value(Body::new(body))?);
 
         if resp.ok() {
             Ok(())

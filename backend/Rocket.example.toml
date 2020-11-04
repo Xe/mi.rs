@@ -29,8 +29,6 @@ api_secret = "..."
 # the API.
 [global.mastodon]
 instance = "..."
-app_id = "..."
-app_secret = "..."
 token = "..."
 account = "..."
 

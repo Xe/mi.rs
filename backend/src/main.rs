@@ -9,7 +9,7 @@ use color_eyre::eyre::Result;
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_prometheus::PrometheusMetrics;
 
-use ::mi::{api, paseto, web, MainDatabase, APPLICATION_NAME};
+use ::mi::{api, paseto, web::*, MainDatabase, APPLICATION_NAME};
 
 #[get("/.within/botinfo")]
 fn botinfo() -> &'static str {
@@ -43,11 +43,11 @@ fn main() -> Result<()> {
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
         .attach(paseto::ed25519_keypair())
-        .attach(web::discord_webhook::Client::fairing())
-        .attach(web::mastodon::Client::fairing())
-        .attach(web::pluralkit::Client::fairing())
-        .attach(web::switchcounter::Client::fairing())
-        .attach(web::twitter::Client::fairing())
+        .attach(discord_webhook::Client::fairing())
+        .attach(mastodon::Client::fairing())
+        .attach(pluralkit::Client::fairing())
+        .attach(switchcounter::Client::fairing())
+        .attach(twitter::Client::fairing())
         .mount("/metrics", prometheus)
         .mount("/", routes![botinfo])
         .mount(
