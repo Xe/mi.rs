@@ -1,12 +1,15 @@
-module Mi exposing (TokenData, errorToString, expectJson, request, tokenDecoder)
+module Mi exposing (TokenData, errorToString, expectJson, request, tokenDecoder, tokenIntrospectURL)
 
 import Http exposing (Error(..))
 import Json.Decode as D
+import Url.Builder as UB
 
 
 type alias TokenData =
     { sub : String
-    , jti : String, aud: String, iss: String
+    , jti : String
+    , aud : String
+    , iss : String
     }
 
 
@@ -17,6 +20,13 @@ tokenDecoder =
         (D.field "jti" D.string)
         (D.field "aud" D.string)
         (D.field "iss" D.string)
+
+
+tokenIntrospectURL : String
+tokenIntrospectURL =
+    UB.absolute
+        [ "api", "token", "info" ]
+        []
 
 
 request method token path body expect =
