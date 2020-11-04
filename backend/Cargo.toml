@@ -10,7 +10,6 @@ edition = "2018"
 chrono = { version = "0.4", features = ["serde"] }
 color-eyre = "0.5"
 twapi-ureq = "0.1.5"
-elefren = "0.22"
 kankyo = "0.3"
 log = "0.4"
 mime = "0.3.0"

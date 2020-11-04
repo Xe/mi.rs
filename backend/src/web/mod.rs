@@ -1,4 +1,5 @@
 pub mod discord_webhook;
+pub mod mastodon;
 pub mod pluralkit;
 pub mod switchcounter;
 pub mod twitter;

@@ -38,6 +38,14 @@ pub fn tweet(body: StringBody, tw: State<web::twitter::Client>, tok: paseto::Tok
     Ok(())
 }
 
+#[post("/toot", data = "<body>")]
+#[instrument(skip(ma), err)]
+pub fn toot(body: StringBody, ma: State<web::mastodon::Client>, tok: paseto::Token) -> Result {
+    ma.toot(body.unwrap())?;
+
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct StringBody(String);
 
