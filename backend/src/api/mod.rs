@@ -87,6 +87,9 @@ pub enum Error {
 
     #[error("invalid webmention: {0}")]
     InvalidWebMention(String),
+
+    #[error("can't switch to the same fronter")]
+    SameFronter,
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;
@@ -96,7 +99,7 @@ impl<'a> Responder<'a> for Error {
         error!("{}", self);
         match self {
             Error::NotFound => Err(Status::NotFound),
-            Error::InvalidWebMention(_) => Err(Status::BadRequest),
+            Error::InvalidWebMention(_) | Error::SameFronter => Err(Status::BadRequest),
             _ => Err(Status::InternalServerError),
         }
     }

@@ -131,6 +131,10 @@ pub fn switch(
         .pop()
         .ok_or_else(|| Error::NotFound)?;
 
+    if member.cmene == to.cmene {
+        return Err(Error::SameFronter);
+    }
+
     let now = Utc::now().naive_utc();
 
     let switch = models::NewSwitch {

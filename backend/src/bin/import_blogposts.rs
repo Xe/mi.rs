@@ -8,7 +8,6 @@ use std::env;
 use mi::{api::posse::*, *};
 
 fn main() -> Result<()> {
-    let _ = kankyo::init();
     color_eyre::install()?;
     tracing_subscriber::fmt::init();
 

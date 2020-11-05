@@ -28,7 +28,6 @@ struct RethinkRow {
 }
 
 fn main() -> Result<()> {
-    let _ = kankyo::init();
     color_eyre::install()?;
     tracing_subscriber::fmt::init();
 
