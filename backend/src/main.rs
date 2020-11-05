@@ -60,7 +60,7 @@ fn main() -> Result<()> {
         .attach(cors)
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
-        .attach(TraceRequest {})
+        .attach(RequestId {})
         .attach(paseto::ed25519_keypair())
         .attach(DiscordWebhook::fairing())
         .attach(Mastodon::fairing())
