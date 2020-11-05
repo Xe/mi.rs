@@ -132,7 +132,7 @@ pub fn switch(
         .ok_or_else(|| Error::NotFound)?;
 
     if member.cmene == to.cmene {
-        return Err(Error::SameFronter);
+        return Err(Error::SameFronter(member.cmene));
     }
 
     let now = Utc::now().naive_utc();

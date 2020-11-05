@@ -11,7 +11,7 @@ use rocket_contrib::helmet::SpaceHelmet;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use rocket_prometheus::PrometheusMetrics;
 
-use ::mi::{api, paseto, web::*, MainDatabase, APPLICATION_NAME};
+use ::mi::{api, paseto, rocket_trace::*, web::*, MainDatabase, APPLICATION_NAME};
 
 #[get("/.within/botinfo")]
 fn botinfo() -> &'static str {
@@ -60,6 +60,7 @@ fn main() -> Result<()> {
         .attach(cors)
         .attach(MainDatabase::fairing())
         .attach(SpaceHelmet::default())
+        .attach(TraceRequest {})
         .attach(paseto::ed25519_keypair())
         .attach(DiscordWebhook::fairing())
         .attach(Mastodon::fairing())

@@ -21,6 +21,7 @@ pub const APPLICATION_NAME: &str = concat!(
 pub mod api;
 pub mod models;
 pub mod paseto;
+pub mod rocket_trace;
 pub mod schema;
 pub mod web;
 
