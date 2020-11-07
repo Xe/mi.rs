@@ -9,12 +9,10 @@ let
   src = builtins.filterSource
     (path: type: type != "directory" || builtins.baseNameOf path != "target")
     ./.;
-in {
-  backend = naersk.buildPackage {
-    name = "mi_backend";
-    inherit src;
-    buildInputs = with pkgs; [ openssl pkg-config sqlite libsodium ];
-    SODIUM_USE_PKG_CONFIG = "1";
-    SODIUM_SHARED = "1";
-  };
+in naersk.buildPackage {
+  name = "mi_backend";
+  inherit src;
+  buildInputs = with pkgs; [ openssl pkg-config sqlite libsodium ];
+  SODIUM_USE_PKG_CONFIG = "1";
+  SODIUM_SHARED = "1";
 }
