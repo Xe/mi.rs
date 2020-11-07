@@ -2,10 +2,10 @@ name: "Nix"
 on:
   push:
     branches:
-      - main
+      - mara
   pull_request:
     branches:
-      - main
+      - mara
 jobs:
   docker-build:
     runs-on: ubuntu-latest
