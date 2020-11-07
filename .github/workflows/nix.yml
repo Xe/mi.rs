@@ -15,3 +15,5 @@ jobs:
       - uses: cachix/cachix-action@v7
         with:
           name: xe
+      - run: |
+          nix-build
