@@ -6,6 +6,7 @@ import Html.Attributes exposing (autofocus, class, value)
 import Html.Events exposing (onClick, onInput)
 import Mi
 import Mi.Switch
+import Mi.WebMention
 
 
 -- We added a new AddTodo message type.
@@ -48,7 +49,6 @@ update msg model =
         UpdateText newText ->
             { model | text = newText }
 
-        -- We append the model.text value to the end of our list of todo strings.
         AddTodo ->
             { model | text = "", todos = model.todos ++ [ model.text ] }
 

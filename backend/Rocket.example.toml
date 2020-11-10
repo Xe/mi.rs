@@ -3,6 +3,7 @@
 address = "0.0.0.0"
 switchcounter_webhook = "..."
 discord_webhook = ""
+asset_path = "../static"
 
 # I don't know how to generate these without using Go, sorry. These are hex-encoded
 # ED25519 public/private keys.

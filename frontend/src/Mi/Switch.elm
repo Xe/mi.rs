@@ -1,11 +1,10 @@
-module Mi.Switch exposing (..)
+module Mi.Switch exposing (Switch, decoder, frontURL, idURL, listURL, switchURL)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
 import Iso8601
 import Json.Decode exposing (Decoder, field, int, map5, nullable, string)
-import Time exposing (..)
+import Time exposing (Posix)
 import Url.Builder as UB
+
 
 type alias Switch =
     { id : String
@@ -36,21 +35,21 @@ switchURL =
 idURL : String -> String
 idURL id =
     UB.absolute
-        [ "api","switches", "id", id ]
+        [ "api", "switches", "id", id ]
         []
 
 
 frontURL : String
 frontURL =
     UB.absolute
-        ["api", "switches", "current" ]
+        [ "api", "switches", "current" ]
         []
 
 
 listURL : Int -> Int -> String
 listURL limit page =
     UB.absolute
-        ["api", "switches", "" ]
+        [ "api", "switches", "" ]
         [ UB.int "limit" limit
         , UB.int "page" page
         ]

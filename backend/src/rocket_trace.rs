@@ -1,8 +1,10 @@
-use rocket::fairing::{Fairing, Info, Kind};
+use rocket::fairing::{AdHoc, Fairing, Info, Kind};
 use rocket::http::Header;
 use rocket::{Data, Request, Response};
+use rocket_contrib::serve::StaticFiles;
 use rusty_ulid::generate_ulid_string;
 
+#[derive(Default)]
 pub struct RequestId;
 
 impl Fairing for RequestId {
@@ -31,4 +33,12 @@ impl Fairing for RequestId {
             None => {}
         };
     }
+}
+
+pub fn static_files() -> AdHoc {
+    AdHoc::on_attach("Static fileserver", |rocket| {
+        let asset_path = rocket.config().get_string("asset_path").unwrap();
+
+        Ok(rocket.mount("/static", StaticFiles::from(asset_path)))
+    })
 }

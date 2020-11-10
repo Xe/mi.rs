@@ -15,6 +15,11 @@
         version = "1.0.2";
       };
 
+      "rtfeldman/elm-css" = {
+        sha256 = "0nxiyxyw3kw55whkpwhrcgc0dr6a8zlm2nqvsaqdw6mzkykg0ba6";
+        version = "16.1.0";
+      };
+
       "elm/core" = {
         sha256 = "19w0iisdd66ywjayyga4kv2p1v9rxzqjaxhckp8ni6n8i0fb2dvf";
         version = "1.0.5";
@@ -48,6 +53,11 @@
       "elm/file" = {
         sha256 = "1rljcb41dl97myidyjih2yliyzddkr2m7n74x7gg46rcw4jl0ny8";
         version = "1.0.5";
+      };
+
+      "rtfeldman/elm-hex" = {
+        sha256 = "1y0aa16asvwdqmgbskh5iba6psp43lkcjjw9mgzj3gsrg33lp00d";
+        version = "1.0.0";
       };
 
       "elm/parser" = {

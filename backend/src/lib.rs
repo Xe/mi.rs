@@ -19,6 +19,7 @@ pub const APPLICATION_NAME: &str = concat!(
 );
 
 pub mod api;
+pub mod frontend;
 pub mod models;
 pub mod paseto;
 pub mod rocket_trace;

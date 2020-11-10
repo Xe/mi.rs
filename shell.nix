@@ -3,6 +3,7 @@ let
   pkgs =
     import sources.nixpkgs { overlays = [ (import sources.nixpkgs-mozilla) ]; };
   rust = import ./nix/rust.nix { };
+  gruvbox = pkgs.callPackage sources.gruvbox-css { };
 in pkgs.mkShell rec {
   buildInputs = with pkgs; [
     # rust
@@ -25,6 +26,8 @@ in pkgs.mkShell rec {
     # keep this line if you use bash
     bashInteractive
   ];
+
+  GRUVBOX_CSS = "${gruvbox}/gruvbox.css";
 
   DATABASE_URL = "./mi.db";
   ROCKET_DATABASES = ''{ main_data = { url = "${DATABASE_URL}" } }'';
