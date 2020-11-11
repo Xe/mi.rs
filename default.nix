@@ -19,13 +19,10 @@ in stdenv.mkDerivation {
 
     # frontend JS
     mkdir -p $out/public/js
-    ln -s ${frontend}/Main.js $out/public/js/Main.js
+    ln -s ${frontend}/Main.js $out/public/js/elm.js
 
     # static files
     cp -vrf ${./static}/* $out/public
-
-    mkdir -p $out/public/css
-    ln -s ${gruvbox}/gruvbox.css $out/public/css/gruvbox.css
 
     # migrations
     ln -s ${./backend/migrations} $out/migrations
