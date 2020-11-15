@@ -1,9 +1,9 @@
 {
-  "short_name": "Elm App",
-  "name": "Create Elm App Sample",
+  "short_name": "mi",
+  "name": "mi_irl",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "/static/favicon.png",
       "sizes": "192x192",
       "type": "image/png"
     }

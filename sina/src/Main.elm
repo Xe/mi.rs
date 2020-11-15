@@ -1,11 +1,8 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, text, div, h1, img)
+import Html exposing (Html, div, h1, img, text)
 import Html.Attributes exposing (src)
-
-
----- MODEL ----
 
 
 type alias Model =
@@ -17,10 +14,6 @@ init =
     ( {}, Cmd.none )
 
 
-
----- UPDATE ----
-
-
 type Msg
     = NoOp
 
@@ -30,20 +23,11 @@ update msg model =
     ( model, Cmd.none )
 
 
-
----- VIEW ----
-
-
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+        [ h1 [] [ text "Your Elm App is working!" ]
         ]
-
-
-
----- PROGRAM ----
 
 
 main : Program () Model Msg

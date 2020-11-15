@@ -22,6 +22,7 @@ in pkgs.mkShell rec {
     elmPackages.elm-format
     elmPackages.elm-language-server
     elm2nix
+    nodePackages.uglify-js
 
     # keep this line if you use bash
     bashInteractive

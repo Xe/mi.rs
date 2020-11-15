@@ -2,7 +2,7 @@
 with pkgs;
 let
   backend = pkgs.callPackage ./backend { inherit sources pkgs; };
-  frontend = pkgs.callPackage ./frontend { inherit sources pkgs; };
+  frontend = pkgs.callPackage ./sina { inherit sources pkgs; };
   gruvbox = pkgs.callPackage sources.gruvbox-css { };
 in stdenv.mkDerivation {
   pname = "mi";
