@@ -1,9 +1,10 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Html exposing (Html, div, h1, img, p, pre, text)
 import Html.Attributes exposing (src)
 import Http
+import Layout
 import Mi
 
 
@@ -39,28 +40,26 @@ update msg model =
                     ( Failure (Mi.errorToString why), Cmd.none )
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document msg
 view model =
     case model of
         Failure why ->
-            div []
-                [ h1 [] [ text "Error" ]
-                , p [] [ text why ]
+            Layout.template "Error"
+                [ p [] [ text why ]
                 ]
 
         Loading ->
-            div [] [ h1 [] [ text "Loading" ] ]
+            Layout.template "Loading" []
 
         Success msg ->
-            div []
-                [ h1 [] [ text "Mi" ]
-                , pre [] [ text msg ]
+            Layout.template "Mi"
+                [ pre [] [ text msg ]
                 ]
 
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.document
         { view = view
         , init = init
         , update = update
