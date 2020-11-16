@@ -38,8 +38,9 @@ template title body =
                 , a [ href "/posse" ] [ text "POSSE" ]
                 , text " - "
                 , a [ href "/switches" ] [ text "Switches" ]
-                , text " - "
-                , a [ href "/webmentions" ] [ text "WebMentions" ]
+
+                --, text " - "
+                --, a [ href "/webmentions" ] [ text "WebMentions" ]
                 ]
              , h1 [] [ text title ]
              ]

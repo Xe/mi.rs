@@ -1,4 +1,4 @@
-module Model exposing (Model, Msg(..), init)
+module Model exposing (Model, Msg(..), get, init)
 
 import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
@@ -25,6 +25,16 @@ type alias Model =
     , switchByID : Maybe Switch
     , webMentionByID : Maybe WebMention
     }
+
+
+get : Model -> String -> Http.Expect Msg -> Cmd Msg
+get model url action =
+    Mi.request
+        "GET"
+        (Maybe.withDefault "" model.token)
+        url
+        Http.emptyBody
+        action
 
 
 type Msg

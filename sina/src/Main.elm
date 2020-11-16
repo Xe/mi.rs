@@ -11,7 +11,7 @@ import Layout
 import Mi
 import Mi.Switch
 import Mi.WebMention
-import Model exposing (Model, Msg(..), init)
+import Model exposing (Model, Msg(..), get, init)
 import Page.Index
 import Page.Login
 import Page.SwitchInfo
@@ -23,6 +23,16 @@ import Url.Parser as UrlParser
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        if_okay : Result Http.Error a -> (a -> ( Model, Cmd Msg )) -> ( Model, Cmd Msg )
+        if_okay result doer =
+            case result of
+                Ok data ->
+                    doer data
+
+                Err why ->
+                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
+    in
     case msg of
         UpdateToken newToken ->
             ( { model | token = Just newToken }, Cmd.none )
@@ -33,90 +43,57 @@ update msg model =
         SubmitToken ->
             ( model
             , Cmd.batch
-                [ Mi.request
-                    "GET"
-                    (Maybe.withDefault "" model.token)
-                    Mi.tokenIntrospectURL
-                    Http.emptyBody
-                    (Mi.expectJson ValidateToken Mi.tokenDecoder)
-                , Mi.request
-                    "GET"
-                    (Maybe.withDefault "" model.token)
-                    Mi.Switch.frontURL
-                    Http.emptyBody
-                    (Mi.expectJson ValidateFront Mi.Switch.decoder)
-                , Mi.request
-                    "GET"
-                    (Maybe.withDefault "" model.token)
-                    (Mi.Switch.listURL 40 model.switchPage)
-                    Http.emptyBody
-                    (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
+                [ get model Mi.tokenIntrospectURL <|
+                    Mi.expectJson ValidateToken Mi.tokenDecoder
+                , get model Mi.Switch.frontURL <|
+                    Mi.expectJson ValidateFront Mi.Switch.decoder
+                , get model (Mi.Switch.listURL 40 model.switchPage) <|
+                    Mi.expectJson ValidateSwitches <|
+                        Json.Decode.list Mi.Switch.decoder
                 ]
             )
 
         FetchSwitch id ->
             ( model
-            , Mi.request
-                "GET"
-                (Maybe.withDefault "" model.token)
-                (Mi.Switch.idURL id)
-                Http.emptyBody
-                (Mi.expectJson ValidateSwitchByID Mi.Switch.decoder)
+            , get model (Mi.Switch.idURL id) <|
+                Mi.expectJson ValidateSwitchByID Mi.Switch.decoder
             )
 
         NextSwitchesPage ->
             ( { model | switchPage = model.switchPage + 1 }
-            , Mi.request
-                "GET"
-                (Maybe.withDefault "" model.token)
-                (Mi.Switch.listURL 40 <| model.switchPage + 1)
-                Http.emptyBody
-                (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
+            , get model (Mi.Switch.listURL 40 <| model.switchPage + 1) <|
+                Mi.expectJson ValidateSwitches <|
+                    Json.Decode.list Mi.Switch.decoder
             )
 
         PrevSwitchesPage ->
             ( { model | switchPage = model.switchPage - 1 }
-            , Mi.request
-                "GET"
-                (Maybe.withDefault "" model.token)
-                (Mi.Switch.listURL 40 <| model.switchPage - 1)
-                Http.emptyBody
-                (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
+            , get model (Mi.Switch.listURL 40 <| model.switchPage - 1) <|
+                Mi.expectJson ValidateSwitches <|
+                    Json.Decode.list Mi.Switch.decoder
             )
 
         ValidateSwitchByID result ->
-            case result of
-                Ok data ->
+            if_okay result <|
+                \data ->
                     ( { model | switchByID = Just data }, Cmd.none )
 
-                Err why ->
-                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
-
         ValidateSwitches result ->
-            case result of
-                Ok data ->
+            if_okay result <|
+                \data ->
                     ( { model | switches = data }, Cmd.none )
 
-                Err why ->
-                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
-
         ValidateFront result ->
-            case result of
-                Ok data ->
+            if_okay result <|
+                \data ->
                     ( { model | front = Just data }, Cmd.none )
 
-                Err why ->
-                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
-
         ValidateToken result ->
-            case result of
-                Ok data ->
+            if_okay result <|
+                \data ->
                     ( { model | tokenData = Just data }
                     , Nav.pushUrl model.navKey "/"
                     )
-
-                Err why ->
-                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
 
         ClickLink urlRequest ->
             case urlRequest of
