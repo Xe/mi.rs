@@ -5,10 +5,18 @@ import Html exposing (br, h2, img, p, s, span, text)
 import Html.Attributes exposing (height, src, width)
 import Iso8601
 import Layout exposing (basic, template)
-import Model exposing (Model)
+import Mi
+import Mi.Switch exposing (Switch)
 
 
-view : Model -> Document msg
+type alias Model a =
+    { a
+        | tokenData : Maybe Mi.TokenData
+        , front : Maybe Switch
+    }
+
+
+view : Model a -> Document msg
 view { tokenData, front } =
     case tokenData of
         Nothing ->

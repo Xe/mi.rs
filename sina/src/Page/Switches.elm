@@ -6,12 +6,21 @@ import Html.Attributes exposing (height, href, src, style, width)
 import Html.Events exposing (onClick)
 import Iso8601
 import Layout exposing (template)
-import Model exposing (Model, Msg(..))
+import Mi.Switch exposing (Switch)
+import Model exposing (Msg(..))
 import Page exposing (format)
 import Time exposing (Month(..), utc)
 
 
-view : Model -> Document Msg
+type alias Model a =
+    { a
+        | front : Maybe Switch
+        , switches : List Switch
+        , switchPage : Int
+    }
+
+
+view : Model a -> Document Msg
 view { front, switches, switchPage } =
     let
         frontInfo =

@@ -5,10 +5,14 @@ import Html exposing (button, input, p, text)
 import Html.Attributes exposing (placeholder, value)
 import Html.Events exposing (onClick, onInput)
 import Layout exposing (basic, template)
-import Model exposing (Model, Msg(..))
+import Model exposing (Msg(..))
 
 
-view : Model -> Document Msg
+type alias Model a =
+    { a | token : Maybe String }
+
+
+view : Model a -> Document Msg
 view model =
     basic "Login"
         [ p [] [ text "Enter the secret code. Unauthorized access is prohibited." ]

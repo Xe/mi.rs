@@ -1,17 +1,19 @@
 module Page.SwitchInfo exposing (view)
 
 import Browser exposing (Document)
-import Browser.Navigation as Nav
-import Html exposing (a, br, button, h2, img, p, span, table, td, text, th, tr)
-import Html.Attributes exposing (href, src, style)
-import Html.Events exposing (onClick)
+import Html exposing (br, img, p, span, text)
+import Html.Attributes exposing (src)
 import Layout exposing (template)
-import Model exposing (Model, Msg(..))
+import Mi.Switch exposing (Switch)
 import Page exposing (format)
-import Time exposing (Month(..), utc)
+import Time exposing (Month(..))
 
 
-view : Model -> Document Msg
+type alias Model a =
+    { a | switchByID : Maybe Switch }
+
+
+view : Model a -> Document msg
 view { switchByID } =
     case switchByID of
         Nothing ->

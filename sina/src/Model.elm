@@ -4,6 +4,7 @@ import Browser exposing (UrlRequest(..))
 import Browser.Navigation as Nav
 import Http
 import Mi
+import Mi.POSSE
 import Mi.Switch exposing (Switch)
 import Mi.WebMention exposing (WebMention)
 import Route exposing (Route, routeParser)
@@ -24,6 +25,7 @@ type alias Model =
     , webMentions : List WebMention
     , switchByID : Maybe Switch
     , webMentionByID : Maybe WebMention
+    , post : Mi.POSSE.Post
     }
 
 
@@ -66,6 +68,7 @@ init _ url key =
       , webMentions = []
       , switchByID = Nothing
       , webMentionByID = Nothing
+      , post = Mi.POSSE.init
       }
     , Nav.pushUrl key "/login"
     )
