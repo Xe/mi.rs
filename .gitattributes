@@ -1,1 +1,3 @@
 nix/sources.nix linguist-vendored
+sina/default.nix linguist-vendored
+sina/elm-srcs.nix linguist-vendored
