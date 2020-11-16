@@ -1,7 +1,7 @@
 module Mi.Switch exposing (Switch, decoder, frontURL, idURL, listURL, switchURL)
 
 import Iso8601
-import Json.Decode exposing (Decoder, field, int, map5, nullable, string)
+import Json.Decode exposing (Decoder, field, int, map6, nullable, string)
 import Time exposing (Posix)
 import Url.Builder as UB
 
@@ -12,17 +12,19 @@ type alias Switch =
     , started_at : Posix
     , ended_at : Maybe Posix
     , duration : Maybe Int
+    , img_url : String
     }
 
 
 decoder : Decoder Switch
 decoder =
-    map5 Switch
+    map6 Switch
         (field "id" string)
         (field "who" string)
         (field "started_at" Iso8601.decoder)
         (field "ended_at" (nullable Iso8601.decoder))
         (field "duration" (nullable int))
+        (field "img_url" string)
 
 
 switchURL : String

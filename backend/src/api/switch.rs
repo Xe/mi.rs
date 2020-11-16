@@ -13,7 +13,8 @@ use rusty_ulid::generate_ulid_string;
 #[derive(serde::Serialize)]
 pub struct FrontChange {
     pub id: String,
-    pub who: String, // models::Member.name
+    pub who: String,     // models::Member.name
+    pub img_url: String, // models::Member.picurl
     pub started_at: NaiveDateTime,
     pub ended_at: Option<NaiveDateTime>,
     pub duration: Option<i32>,
@@ -46,6 +47,7 @@ pub fn list(
             duration: switch.duration(),
             id: switch.id,
             who: member.cmene,
+            img_url: member.picurl,
             started_at: switch.started_at,
             ended_at: switch.ended_at,
         })
@@ -74,6 +76,7 @@ pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<Fron
             duration: switch.duration(),
             id: switch.id,
             who: member.cmene,
+            img_url: member.picurl,
             started_at: switch.started_at,
             ended_at: switch.ended_at,
         })),
@@ -181,6 +184,7 @@ pub fn get(tok: paseto::Token, conn: MainDatabase, switch_id: String) -> Result<
         duration: switch.duration(),
         id: switch.id,
         who: member.cmene,
+        img_url: member.picurl,
         started_at: switch.started_at,
         ended_at: switch.ended_at,
     }))

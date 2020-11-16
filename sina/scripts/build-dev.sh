@@ -2,5 +2,5 @@
 #! nix-shell -i bash -p elmPackages.elm
 
 echo "--------------- rebuilding ------------------"
-elm make ./src/Main.elm --output elm.js
+elm make ./src/Main.elm --output elm.js --debug
 echo "------------------ done ---------------------"

@@ -7,6 +7,7 @@ import Url.Parser.Query as Query
 type Route
     = Index
     | Login
+    | NotFound
     | System
     | SwitchLog (Maybe Int)
     | SwitchID String

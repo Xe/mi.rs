@@ -1,4 +1,4 @@
-module Mi.WebMention exposing (decoder, idURL, listURL)
+module Mi.WebMention exposing (WebMention, decoder, idURL, listURL)
 
 import Json.Decode exposing (Decoder, field, map3, string)
 import Url.Builder as UB
