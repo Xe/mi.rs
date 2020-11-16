@@ -45,10 +45,7 @@ update msg model =
                     (Mi.expectJson ValidateFront Mi.Switch.decoder)
                 , Mi.request
                     "GET"
-                    (Maybe.withDefault
-                        ""
-                        model.token
-                    )
+                    (Maybe.withDefault "" model.token)
                     (Mi.Switch.listURL 30 model.switchPage)
                     Http.emptyBody
                     (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
@@ -69,10 +66,7 @@ update msg model =
             ( model
             , Mi.request
                 "GET"
-                (Maybe.withDefault
-                    ""
-                    model.token
-                )
+                (Maybe.withDefault "" model.token)
                 (Mi.Switch.listURL 30 model.switchPage)
                 Http.emptyBody
                 (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
