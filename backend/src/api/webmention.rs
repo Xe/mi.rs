@@ -2,6 +2,7 @@ use super::{Error, Result};
 use crate::{models, paseto, schema, web::discord_webhook::Client as DiscordWebhook, MainDatabase};
 use diesel::prelude::*;
 use rocket::{
+    http::Status,
     request::Form,
     response::{self, Responder},
     Request, Response, State,
@@ -66,6 +67,7 @@ impl<'a> Responder<'a> for models::WebMention {
                 "Location",
                 format!("https://mi.christine.website/api/webmention/{}", self.id),
             )
+            .status(Status::Created)
             .ok()
     }
 }

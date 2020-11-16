@@ -7,6 +7,7 @@ import Html.Events exposing (onClick)
 import Iso8601
 import Layout exposing (template)
 import Model exposing (Model, Msg(..))
+import Page exposing (format)
 import Time exposing (Month(..), utc)
 
 
@@ -43,58 +44,6 @@ view { front, switches, switchPage } =
                 , th [] [ text "End" ]
                 ]
 
-        formatMonth month =
-            case month of
-                Jan ->
-                    "Jan"
-
-                Feb ->
-                    "Feb"
-
-                Mar ->
-                    "Mar"
-
-                Apr ->
-                    "Apr"
-
-                May ->
-                    "May"
-
-                Jun ->
-                    "Jun"
-
-                Jul ->
-                    "Jul"
-
-                Aug ->
-                    "Aug"
-
-                Sep ->
-                    "Sep"
-
-                Oct ->
-                    "Oct"
-
-                Nov ->
-                    "Nov"
-
-                Dec ->
-                    "Dec"
-
-        format time =
-            span
-                []
-                [ text <| String.pad 2 '0' <| String.fromInt <| Time.toHour utc time
-                , text ":"
-                , text <| String.pad 2 '0' <| String.fromInt <| Time.toMinute utc time
-                , text " "
-                , text <| formatMonth <| Time.toMonth utc time
-                , text " "
-                , text <| String.pad 2 '0' <| String.fromInt <| Time.toDay utc time
-                , text " "
-                , text <| String.fromInt <| Time.toYear utc time
-                ]
-
         rowify data =
             let
                 ended_at =
@@ -108,7 +57,11 @@ view { front, switches, switchPage } =
             tr
                 []
                 [ td [] [ img [ src data.img_url, width 16, height 16 ] [] ]
-                , td [] [ a [ href <| "/switches/" ++ data.id ] [ text <| String.slice 0 10 data.id ] ]
+                , td []
+                    [ a
+                        [ href <| "/switches/" ++ data.id, onClick <| FetchSwitch data.id ]
+                        [ text <| String.slice 0 10 data.id ]
+                    ]
                 , td [] [ text data.who ]
                 , td [] [ format data.started_at ]
                 , td [] [ ended_at ]

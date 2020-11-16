@@ -14,6 +14,7 @@ import Mi.WebMention
 import Model exposing (Model, Msg(..), init)
 import Page.Index
 import Page.Login
+import Page.SwitchInfo
 import Page.Switches
 import Route exposing (Route(..), routeParser)
 import Url
@@ -142,6 +143,9 @@ view model =
 
                 SwitchLog ->
                     Page.Switches.view model
+
+                SwitchID _ ->
+                    Page.SwitchInfo.view model
 
                 _ ->
                     Layout.template "Oh noes" [ p [] [ text "todo: implement this 404 page" ] ]

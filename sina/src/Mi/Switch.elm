@@ -37,7 +37,7 @@ switchURL =
 idURL : String -> String
 idURL id =
     UB.absolute
-        [ "api", "switches", "id", id ]
+        [ "api", "switches", id ]
         []
 
 
