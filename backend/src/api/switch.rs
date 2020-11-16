@@ -77,8 +77,8 @@ pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<Fron
             id: switch.id,
             who: member.cmene,
             img_url: member.picurl,
-            started_at: switch.started_at,
-            ended_at: switch.ended_at,
+            started_at: switch.started_at.round_subsecs(0),
+            ended_at: switch.ended_at.map(|time| time.round_subsecs(0)),
         })),
         None => Err(Error::NotFound),
     }
@@ -185,7 +185,7 @@ pub fn get(tok: paseto::Token, conn: MainDatabase, switch_id: String) -> Result<
         id: switch.id,
         who: member.cmene,
         img_url: member.picurl,
-        started_at: switch.started_at,
-        ended_at: switch.ended_at,
+        started_at: switch.started_at.round_subsecs(0),
+        ended_at: switch.ended_at.map(|time| time.round_subsecs(0)),
     }))
 }

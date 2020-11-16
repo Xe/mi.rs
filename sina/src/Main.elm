@@ -14,6 +14,7 @@ import Mi.WebMention
 import Model exposing (Model, Msg(..), init)
 import Page.Index
 import Page.Login
+import Page.Switches
 import Route exposing (Route(..), routeParser)
 import Url
 import Url.Parser as UrlParser
@@ -46,7 +47,7 @@ update msg model =
                 , Mi.request
                     "GET"
                     (Maybe.withDefault "" model.token)
-                    (Mi.Switch.listURL 30 model.switchPage)
+                    (Mi.Switch.listURL 40 model.switchPage)
                     Http.emptyBody
                     (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
                 ]
@@ -62,12 +63,22 @@ update msg model =
                 (Mi.expectJson ValidateSwitchByID Mi.Switch.decoder)
             )
 
-        FetchSwitches ->
-            ( model
+        NextSwitchesPage ->
+            ( { model | switchPage = model.switchPage + 1 }
             , Mi.request
                 "GET"
                 (Maybe.withDefault "" model.token)
-                (Mi.Switch.listURL 30 model.switchPage)
+                (Mi.Switch.listURL 40 <| model.switchPage + 1)
+                Http.emptyBody
+                (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
+            )
+
+        PrevSwitchesPage ->
+            ( { model | switchPage = model.switchPage - 1 }
+            , Mi.request
+                "GET"
+                (Maybe.withDefault "" model.token)
+                (Mi.Switch.listURL 40 <| model.switchPage - 1)
                 Http.emptyBody
                 (Mi.expectJson ValidateSwitches (Json.Decode.list Mi.Switch.decoder))
             )
@@ -129,11 +140,8 @@ view model =
                 Login ->
                     Page.Login.view model
 
-                NotFound ->
-                    Layout.template "Oh noes" [ p [] [ text "todo: implement this 404 page" ] ]
-
-                System ->
-                    Layout.template "System Info" [ p [] [ text "TODO(Ashe): implement this page" ] ]
+                SwitchLog ->
+                    Page.Switches.view model
 
                 _ ->
                     Layout.template "Oh noes" [ p [] [ text "todo: implement this 404 page" ] ]

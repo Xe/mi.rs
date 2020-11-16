@@ -1,18 +1,16 @@
-module Route exposing (..)
+module Route exposing (Route(..), routeParser)
 
-import Url.Parser exposing ((</>), (<?>), Parser, int, map, oneOf, s, string)
-import Url.Parser.Query as Query
+import Url.Parser exposing ((</>), Parser, map, oneOf, s, string)
 
 
 type Route
     = Index
     | Login
     | NotFound
-    | System
-    | SwitchLog (Maybe Int)
+    | SwitchLog
     | SwitchID String
     | MakeSwitch
-    | WebMentionLog (Maybe Int)
+    | WebMentionLog
     | WebMentionID String
 
 
@@ -21,10 +19,9 @@ routeParser =
     oneOf
         [ map Index (s "")
         , map Login (s "login")
-        , map System (s "system")
-        , map SwitchLog (s "switches" <?> Query.int "page")
+        , map SwitchLog (s "switches")
         , map SwitchID (s "switches" </> string)
         , map MakeSwitch (s "switches" </> s "log")
-        , map WebMentionLog (s "webmentions" <?> Query.int "page")
+        , map WebMentionLog (s "webmentions")
         , map WebMentionID (s "webmentions" </> string)
         ]

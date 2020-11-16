@@ -33,7 +33,8 @@ type Msg
     | UpdateToken String
     | SubmitToken
     | FetchSwitch String
-    | FetchSwitches
+    | NextSwitchesPage
+    | PrevSwitchesPage
     | ValidateToken (Result Http.Error Mi.TokenData)
     | ValidateSwitchByID (Result Http.Error Switch)
     | ValidateFront (Result Http.Error Switch)
