@@ -2,7 +2,7 @@ module Page.Switches exposing (view)
 
 import Browser exposing (Document)
 import Html exposing (a, br, button, h2, img, p, span, table, td, text, th, tr)
-import Html.Attributes exposing (height, href, src, width)
+import Html.Attributes exposing (height, href, src, style, width)
 import Html.Events exposing (onClick)
 import Iso8601
 import Layout exposing (template)
@@ -90,7 +90,7 @@ view { front, switches, switchPage } =
                 , text " "
                 , text <| formatMonth <| Time.toMonth utc time
                 , text " "
-                , text <| String.fromInt <| Time.toDay utc time
+                , text <| String.pad 2 '0' <| String.fromInt <| Time.toDay utc time
                 , text " "
                 , text <| String.fromInt <| Time.toYear utc time
                 ]
@@ -130,7 +130,7 @@ view { front, switches, switchPage } =
         body =
             [ table [] <| [ heading ] ++ contents
             , p
-                []
+                [ style "margin" "auto" ]
                 [ prevButton
                 , text <| String.fromInt switchPage
                 , nextButton
