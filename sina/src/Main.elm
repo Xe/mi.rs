@@ -10,41 +10,12 @@ import Layout
 import Mi
 import Mi.Switch
 import Mi.WebMention
+import Model exposing (Model, Msg(..), init)
+import Page.Index
+import Page.Login
 import Route exposing (Route(..), routeParser)
 import Url exposing (Url)
 import Url.Parser as UrlParser exposing ((</>))
-
-
-{-| All of the data that the app can hold.
--}
-type alias Model =
-    { navKey : Nav.Key
-    , route : Maybe Route
-    , token : Maybe String
-    , tokenData : Maybe Mi.TokenData
-    , error : Maybe String
-    }
-
-
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
-init _ url key =
-    ( { navKey = key
-      , route = UrlParser.parse routeParser url
-      , token = Nothing
-      , tokenData = Nothing
-      , error = Nothing
-      }
-    , Cmd.none
-    )
-
-
-type Msg
-    = ChangeUrl Url
-    | ClickLink UrlRequest
-    | UpdateToken String
-    | SubmitToken
-    | ValidateToken (Result Http.Error Mi.TokenData)
-    | ClearError
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,7 +56,7 @@ update msg model =
                     ( model, Nav.load url )
 
         ClearError ->
-            ( { model | error = Nothing, token = Nothing }, Cmd.none )
+            ( { model | error = Nothing }, Cmd.none )
 
 
 view : Model -> Document Msg
@@ -94,34 +65,10 @@ view model =
         Nothing ->
             case Maybe.withDefault Index model.route of
                 Index ->
-                    case model.tokenData of
-                        Nothing ->
-                            Layout.basic "Login Required" []
-
-                        Just data ->
-                            Layout.template "Mi"
-                                [ p
-                                    []
-                                    [ span
-                                        []
-                                        [ text "Subscriber: "
-                                        , text data.sub
-                                        , br [] []
-                                        , text "Token ID: "
-                                        , text data.jti
-                                        , br [] []
-                                        , text "Issuer: "
-                                        , text data.iss
-                                        ]
-                                    ]
-                                ]
+                    Page.Index.view model
 
                 Login ->
-                    Layout.basic "Login"
-                        [ p [] [ text "Enter the secret code. Unauthorized access is prohibited." ]
-                        , input [ placeholder "API Token", value (Maybe.withDefault "" model.token), onInput UpdateToken ] []
-                        , button [ onClick SubmitToken ] [ text "Login" ]
-                        ]
+                    Page.Login.view model
 
                 _ ->
                     Debug.todo "implement routing"
@@ -129,7 +76,7 @@ view model =
         Just why ->
             Layout.basic
                 "Error"
-                [ p [] [ text why ]
+                [ p [] [ text why, text ". Please clear the error to proceed." ]
                 , a [ onClick ClearError, href "/" ] [ text "Clear error" ]
                 ]
 
