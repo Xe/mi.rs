@@ -1,67 +1,146 @@
 module Main exposing (main)
 
-import Browser
-import Html exposing (Html, div, h1, img, p, pre, text)
-import Html.Attributes exposing (src)
+import Browser exposing (Document, UrlRequest(..))
+import Browser.Navigation as Nav
+import Html exposing (Html, a, br, button, div, h1, img, input, p, pre, span, text)
+import Html.Attributes exposing (href, placeholder, src, value)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Layout
 import Mi
+import Mi.Switch
+import Mi.WebMention
+import Route exposing (Route(..), routeParser)
+import Url exposing (Url)
+import Url.Parser as UrlParser exposing ((</>))
 
 
-type Model
-    = Failure String
-    | Loading
-    | Success String
+{-| All of the data that the app can hold.
+-}
+type alias Model =
+    { navKey : Nav.Key
+    , route : Maybe Route
+    , token : Maybe String
+    , tokenData : Maybe Mi.TokenData
+    , error : Maybe String
+    }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Loading
-    , Http.get
-        { url = "/.within/botinfo"
-        , expect = Http.expectString GotText
-        }
+init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ url key =
+    ( { navKey = key
+      , route = UrlParser.parse routeParser url
+      , token = Nothing
+      , tokenData = Nothing
+      , error = Nothing
+      }
+    , Cmd.none
     )
 
 
 type Msg
-    = GotText (Result Http.Error String)
+    = ChangeUrl Url
+    | ClickLink UrlRequest
+    | UpdateToken String
+    | SubmitToken
+    | ValidateToken (Result Http.Error Mi.TokenData)
+    | ClearError
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotText result ->
+        UpdateToken newToken ->
+            ( { model | token = Just newToken }, Cmd.none )
+
+        ChangeUrl url ->
+            ( { model | route = UrlParser.parse routeParser url }, Cmd.none )
+
+        SubmitToken ->
+            ( model
+            , Mi.request
+                "GET"
+                (Maybe.withDefault "" model.token)
+                Mi.tokenIntrospectURL
+                Http.emptyBody
+                (Mi.expectJson ValidateToken Mi.tokenDecoder)
+            )
+
+        ValidateToken result ->
             case result of
-                Ok fullText ->
-                    ( Success fullText, Cmd.none )
+                Ok data ->
+                    ( { model | tokenData = Just data }
+                    , Nav.pushUrl model.navKey "/"
+                    )
 
                 Err why ->
-                    ( Failure (Mi.errorToString why), Cmd.none )
+                    ( { model | error = Just <| Mi.errorToString why }, Cmd.none )
+
+        ClickLink urlRequest ->
+            case urlRequest of
+                Internal url ->
+                    ( model, Nav.pushUrl model.navKey <| Url.toString url )
+
+                External url ->
+                    ( model, Nav.load url )
+
+        ClearError ->
+            ( { model | error = Nothing, token = Nothing }, Cmd.none )
 
 
-view : Model -> Browser.Document msg
+view : Model -> Document Msg
 view model =
-    case model of
-        Failure why ->
-            Layout.template "Error"
+    case model.error of
+        Nothing ->
+            case Maybe.withDefault Index model.route of
+                Index ->
+                    case model.tokenData of
+                        Nothing ->
+                            Layout.basic "Login Required" []
+
+                        Just data ->
+                            Layout.template "Mi"
+                                [ p
+                                    []
+                                    [ span
+                                        []
+                                        [ text "Subscriber: "
+                                        , text data.sub
+                                        , br [] []
+                                        , text "Token ID: "
+                                        , text data.jti
+                                        , br [] []
+                                        , text "Issuer: "
+                                        , text data.iss
+                                        ]
+                                    ]
+                                ]
+
+                Login ->
+                    Layout.basic "Login"
+                        [ p [] [ text "Enter the secret code. Unauthorized access is prohibited." ]
+                        , input [ placeholder "API Token", value (Maybe.withDefault "" model.token), onInput UpdateToken ] []
+                        , button [ onClick SubmitToken ] [ text "Login" ]
+                        ]
+
+                _ ->
+                    Debug.todo "implement routing"
+
+        Just why ->
+            Layout.basic
+                "Error"
                 [ p [] [ text why ]
-                ]
-
-        Loading ->
-            Layout.template "Loading" []
-
-        Success msg ->
-            Layout.template "Mi"
-                [ pre [] [ text msg ]
+                , a [ onClick ClearError, href "/" ] [ text "Clear error" ]
                 ]
 
 
 main : Program () Model Msg
 main =
-    Browser.document
+    Browser.application
         { view = view
         , init = init
         , update = update
         , subscriptions = always Sub.none
+        , onUrlRequest = ClickLink
+        , onUrlChange = ChangeUrl
         }

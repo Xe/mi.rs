@@ -15,21 +15,7 @@ use ::mi::{api, frontend, paseto, rocket_trace::*, web::*, MainDatabase, APPLICA
 
 #[get("/.within/botinfo")]
 fn botinfo() -> &'static str {
-    r#"Hello, if you are reading this, you have found this URL in your
-access logs. If this program is doing something you don't want it to do,
-please contact me at me@christine.website.
-
-This service is intended to act as a POSSE[1] syndication server for
-various services to various other services.
-
-Every effort is being taken to ensure that the data going through this
-server is my own.
-
-I'm sorry if this causes you any inconvenience.
-
-[1]: https://indieweb.org/POSSE
-
-Be well, Creator."#
+    include_str!("./botinfo.txt")
 }
 
 fn main() -> Result<()> {

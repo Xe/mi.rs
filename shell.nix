@@ -24,6 +24,9 @@ in pkgs.mkShell rec {
     elm2nix
     nodePackages.uglify-js
 
+    # tools
+    entr
+
     # keep this line if you use bash
     bashInteractive
   ];
