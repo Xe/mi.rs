@@ -34,7 +34,6 @@ in pkgs.mkShell rec {
   GRUVBOX_CSS = "${gruvbox}/gruvbox.css";
 
   DATABASE_URL = "./mi.db";
-  MIGRATION_PATH = "./migrations";
   ROCKET_DATABASES = ''{ main_data = { url = "${DATABASE_URL}" } }'';
   RUST_LOG = "info";
 
