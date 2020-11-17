@@ -10,6 +10,7 @@ edition = "2018"
 askama_rocket = "0.10"
 chrono = { version = "0.4", features = ["serde"] }
 color-eyre = "0.5"
+diesel_migrations = "1"
 futures-io = "0.3"
 hex = "0.4"
 log = "0.4"
