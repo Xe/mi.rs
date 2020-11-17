@@ -24,8 +24,11 @@ fn main() -> Result<()> {
 
     info!("{} starting up", APPLICATION_NAME);
 
-    let allowed_origins =
-        AllowedOrigins::some_exact(&["https://mi.within.website", "http://localhost:8000"]);
+    let allowed_origins = AllowedOrigins::some_exact(&[
+        "https://mi.within.website",
+        "http://localhost:8000",
+        "http://mi.akua",
+    ]);
 
     // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
