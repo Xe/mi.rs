@@ -23,7 +23,7 @@ let
       cp -vrf ${./static}/* $out/public
 
       # frontend JS
-      rm $out/public/elm.js
+      rm $out/public/elm.js ||:
       ln -s ${frontend}/Main.min.js $out/public/elm.js
     '';
   };
