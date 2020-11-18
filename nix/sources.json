@@ -5,10 +5,10 @@
         "homepage": null,
         "owner": "Xe",
         "repo": "gruvbox-css",
-        "rev": "6e1841c94190a1e06e63a2596767e66c35671320",
-        "sha256": "0s7whnin63558i70wp3by3rydsdx0qdzh5553km1s29w81npmgj6",
+        "rev": "0e78b4332ead8635697b990f309608d99b46967e",
+        "sha256": "00n59d5f5k9aq0pd99i0nkrzisanny9nwgzqjc9ijy4y66r9bnvn",
         "type": "tarball",
-        "url": "https://github.com/Xe/gruvbox-css/archive/6e1841c94190a1e06e63a2596767e66c35671320.tar.gz",
+        "url": "https://github.com/Xe/gruvbox-css/archive/0e78b4332ead8635697b990f309608d99b46967e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "naersk": {
