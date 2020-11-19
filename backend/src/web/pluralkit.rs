@@ -1,13 +1,12 @@
 use super::{Error, Result};
-use chrono::NaiveDateTime;
 use rocket::fairing::AdHoc;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 #[derive(Deserialize, Debug)]
 pub struct ProxyTag {
-    pub prefix: String,
-    pub suffix: String,
+    pub prefix: Option<String>,
+    pub suffix: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -21,12 +20,18 @@ pub struct Member {
     pub birthday: Option<String>,
     pub proxy_tags: Option<Vec<ProxyTag>>,
     pub keep_proxy: bool,
-    pub created: NaiveDateTime,
+    pub created: String,
 }
 
 #[derive(Serialize, Debug)]
 pub struct SwitchRequest {
     pub members: Vec<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct SystemStatus {
+    pub timestamp: String,
+    pub members: Vec<Member>,
 }
 
 pub struct Client {
@@ -35,6 +40,13 @@ pub struct Client {
 }
 
 impl Client {
+    pub fn new(token: String) -> Client {
+        Client {
+            api_token: token,
+            member_mappings: BTreeMap::new(),
+        }
+    }
+
     pub fn fairing() -> AdHoc {
         AdHoc::on_attach("PluralKit client", |rocket| {
             let cfg = rocket.config();
@@ -53,6 +65,28 @@ impl Client {
             };
             Ok(rocket.manage(cli))
         })
+    }
+
+    #[instrument(err, skip(self))]
+    pub fn status(&self, system_id: String) -> Result<SystemStatus> {
+        let resp = ureq::get(&format!(
+            "https://api.pluralkit.me/v1/s/{}/fronters",
+            system_id
+        ))
+        .set("Authorization", &self.api_token)
+        .set("User-Agent", crate::APPLICATION_NAME)
+        .call();
+
+        debug!("headers: {:?}", resp.headers_names());
+
+        if resp.ok() {
+            Ok(resp.into_json_deserialize()?)
+        } else {
+            Err(match resp.synthetic_error() {
+                Some(why) => Error::UReq(why.to_string()),
+                None => Error::HttpStatus(resp.status()),
+            })
+        }
     }
 
     #[instrument(err, skip(self))]
