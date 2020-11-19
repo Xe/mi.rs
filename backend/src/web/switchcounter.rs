@@ -24,7 +24,7 @@ pub struct SwitchCommand {
 #[derive(Deserialize, Debug)]
 pub struct Status {
     pub member_name: String,
-    pub started_at: chrono::NaiveDateTime,
+    pub started_at: String,
 }
 
 pub struct Client {
@@ -55,6 +55,7 @@ impl Client {
         let resp = ureq::post(&self.webhook_url).send_json(serde_json::to_value(Wrapper {
             webhook: FrontAsk::default(),
         })?);
+
         if resp.ok() {
             Ok(resp.into_json_deserialize()?)
         } else {
