@@ -24,7 +24,7 @@ pub struct SwitchCommand {
 #[derive(Deserialize, Debug)]
 pub struct Status {
     pub member_name: String,
-    pub started_at: String,
+    pub started_at: Option<String>,
 }
 
 pub struct Client {
