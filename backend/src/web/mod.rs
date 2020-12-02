@@ -1,3 +1,4 @@
+pub mod bridgy;
 pub mod discord_webhook;
 pub mod mastodon;
 pub mod pluralkit;

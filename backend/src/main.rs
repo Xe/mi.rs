@@ -72,6 +72,7 @@ fn main() -> Result<()> {
                 api::switch::switch,
                 api::webmention::accept,
                 api::webmention::get,
+                api::webmention::lookup_target,
                 api::webmention::list,
                 api::get_members,
                 api::token_info,

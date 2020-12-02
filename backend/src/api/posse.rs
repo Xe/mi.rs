@@ -22,6 +22,7 @@ pub struct Item {
     pub url: String,
     pub title: String,
     pub tags: Option<Vec<String>>,
+    pub content_html: String,
 }
 
 impl Item {

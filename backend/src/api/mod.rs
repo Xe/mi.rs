@@ -90,6 +90,12 @@ pub enum Error {
 
     #[error("can't switch to the same fronter {0}")]
     SameFronter(String),
+
+    #[error("target doesn't mention source")]
+    TargetDoesntMentionSource(String),
+
+    #[error("readability error: {0}")]
+    Readability(#[from] readability_fork::error::Error),
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;

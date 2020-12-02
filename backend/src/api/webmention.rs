@@ -1,6 +1,11 @@
 use super::{Error, Result};
-use crate::{models, paseto, schema, web::discord_webhook::Client as DiscordWebhook, MainDatabase};
+use crate::{
+    models, paseto, schema,
+    web::{self, discord_webhook::Client as DiscordWebhook},
+    MainDatabase,
+};
 use diesel::prelude::*;
+use readability_fork::extractor::{self, Product};
 use rocket::{
     http::Status,
     request::Form,
@@ -9,12 +14,14 @@ use rocket::{
 };
 use rocket_contrib::json::Json;
 use rusty_ulid::generate_ulid_string;
+use serde::Serialize;
 use url::Url;
 
-#[derive(FromForm, Debug)]
+#[derive(FromForm, Debug, Serialize)]
 pub struct WebMention {
     source: String,
     target: String,
+    title: Option<String>,
 }
 
 impl WebMention {
@@ -48,6 +55,28 @@ impl WebMention {
 
         Ok(())
     }
+
+    fn extract(&self) -> Result<Product> {
+        let resp = ureq::get(&self.source)
+            .set("User-Agent", crate::APPLICATION_NAME)
+            .set("Mi-Mentioned-Url", &self.target)
+            .call();
+
+        if resp.ok() {
+            let body = resp
+                .into_string()
+                .map_err(|why| Error::Web(web::Error::FuturesIO(why)))?;
+            Ok(extractor::extract(
+                &mut body.as_bytes(),
+                &url::Url::parse(&self.source)?,
+            )?)
+        } else {
+            Err(match resp.synthetic_error() {
+                Some(why) => Error::Web(web::Error::UReq(why.to_string())),
+                None => Error::Web(web::Error::HttpStatus(resp.status())),
+            })
+        }
+    }
 }
 
 impl Into<models::WebMention> for WebMention {
@@ -56,6 +85,17 @@ impl Into<models::WebMention> for WebMention {
             id: generate_ulid_string(),
             source_url: self.source,
             target_url: self.target,
+            title: self.title,
+        }
+    }
+}
+
+impl Into<WebMention> for models::WebMention {
+    fn into(self) -> WebMention {
+        WebMention {
+            source: self.source_url,
+            target: self.target_url,
+            title: self.title,
         }
     }
 }
@@ -72,8 +112,24 @@ impl<'a> Responder<'a> for models::WebMention {
     }
 }
 
+#[get("/webmention/for?<target>")]
+#[instrument(skip(conn), err)]
+pub fn lookup_target(conn: MainDatabase, target: String) -> Result<Json<Vec<WebMention>>> {
+    use schema::webmentions::dsl::*;
+
+    Ok(Json(
+        webmentions
+            .filter(target_url.eq(target))
+            .load::<models::WebMention>(&*conn)
+            .map_err(Error::Database)?
+            .into_iter()
+            .map(Into::into)
+            .collect::<Vec<WebMention>>(),
+    ))
+}
+
 #[post("/webmention/accept", data = "<mention>")]
-#[instrument(skip(conn, mention, dw), err)]
+#[instrument(skip(conn, dw), err)]
 pub fn accept(
     conn: MainDatabase,
     mention: Form<WebMention>,
@@ -81,13 +137,26 @@ pub fn accept(
 ) -> Result<models::WebMention> {
     use schema::webmentions;
 
-    let mention = mention.into_inner();
+    let mut mention = mention.into_inner();
     mention.check()?;
+    mention
+        .extract()
+        .map_err(|why| {
+            error!(
+                "error extracting information from {}: {}",
+                mention.source, why
+            );
+
+            why
+        })
+        .iter_mut()
+        .for_each(|info| mention.title = Some(info.title.clone()));
 
     info!(
         source = &mention.source[..],
         target = &mention.target[..],
-        "webmention received"
+        "webmention received: {:?}",
+        mention.title,
     );
 
     let wm: models::WebMention = mention.into();
@@ -95,6 +164,8 @@ pub fn accept(
         .values(&wm)
         .execute(&*conn)
         .map_err(Error::Database)?;
+
+    bridgy_expand(conn, wm.clone())?;
 
     dw.send(format!(
         "<{}> mentioned <{}> (<https://mi.within.website/api/webmention/{}>)",
@@ -143,4 +214,42 @@ pub fn list(
             .load::<models::WebMention>(&*conn)
             .map_err(Error::Database)?,
     ))
+}
+
+pub fn bridgy_expand(conn: MainDatabase, wm: models::WebMention) -> Result {
+    use crate::web::bridgy::parse;
+    use schema::webmentions::dsl::*;
+
+    if !wm.source_url.contains("https://brid-gy.appspot.com") {
+        return Ok(());
+    }
+
+    if wm.source_url.contains("like/twitter") {
+        return Ok(());
+    }
+
+    let resp = ureq::get(&wm.source_url)
+        .set("User-Agent", crate::APPLICATION_NAME)
+        .set("Mi-Mentioned-Url", &wm.target_url)
+        .call();
+
+    if resp.ok() {
+        let body = resp.into_string().unwrap();
+        let result = parse(&body).unwrap().unwrap();
+        debug!("{:?}", result);
+
+        diesel::update(webmentions.find(wm.id))
+            .set(&models::UpdateWebMentionSource {
+                source_url: result.target,
+            })
+            .execute(&*conn)
+            .map_err(Error::Database)
+            .unwrap();
+        Ok(())
+    } else {
+        Err(match resp.synthetic_error() {
+            Some(why) => Error::Web(web::Error::UReq(why.to_string())),
+            None => Error::Web(web::Error::HttpStatus(resp.status())),
+        })
+    }
 }

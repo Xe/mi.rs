@@ -18,11 +18,13 @@ mime = "0.3.0"
 paseto = { version = "1.0", features = ["easy_tokens", "v2"] }
 prometheus = { version = "0.10", default-features = false, features = ["process"] }
 rand = "0"
+readability-fork = { version = "0.2", default-features = false }
 ring = { version = "^0.16", features = ["std"] }
 rocket = "0.4"
 rocket_cors = "0.5"
 rocket_prometheus = "0.7.0"
 rusty_ulid = "0.10"
+scraper = "0.12.0"
 serde_json = "^1"
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"

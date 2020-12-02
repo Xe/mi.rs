@@ -27,6 +27,7 @@ table! {
         id -> Text,
         source_url -> Text,
         target_url -> Text,
+        title -> Nullable<Text>,
     }
 }
 
