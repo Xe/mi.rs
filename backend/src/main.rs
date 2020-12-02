@@ -6,7 +6,7 @@ extern crate rocket;
 extern crate tracing;
 
 use color_eyre::eyre::Result;
-use rocket::http::Method;
+use rocket::{fairing::AdHoc, http::Method};
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use rocket_prometheus::PrometheusMetrics;
@@ -58,6 +58,13 @@ fn main() -> Result<()> {
         .attach(PluralKit::fairing())
         .attach(SwitchCounter::fairing())
         .attach(Twitter::fairing())
+        .attach(AdHoc::on_launch("systemd readiness", |_| {
+            if let Ok(ref mut n) = sdnotify::SdNotify::from_env() {
+                let _ = n
+                    .notify_ready()
+                    .map_err(|why| error!("can't signal readiness to systemd: {}", why));
+            }
+        }))
         .mount("/metrics", prometheus)
         .mount("/", routes![botinfo])
         .mount(
