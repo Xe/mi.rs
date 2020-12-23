@@ -23,6 +23,14 @@ table! {
 }
 
 table! {
+    weather (ts) {
+        ts -> Timestamp,
+        region -> Text,
+        body -> Binary,
+    }
+}
+
+table! {
     webmentions (id) {
         id -> Text,
         source_url -> Text,
@@ -37,5 +45,6 @@ allow_tables_to_appear_in_same_query!(
     blogposts,
     members,
     switches,
+    weather,
     webmentions,
 );

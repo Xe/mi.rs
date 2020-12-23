@@ -11,6 +11,8 @@ askama_rocket = "0.10"
 chrono = { version = "0.4", features = ["serde"] }
 color-eyre = "0.5"
 diesel_migrations = "1"
+encoding_rs = "0.8.26"
+encoding_rs_io = "0.1"
 futures-io = "0.3"
 hex = "0.4"
 log = "0.4"
@@ -28,6 +30,7 @@ scraper = "0.12.0"
 sdnotify = { version = "0.1", default-features = false }
 serde_json = "^1"
 serde = { version = "1", features = ["derive"] }
+serde-xml-rs = "0.4.0"
 thiserror = "1"
 tracing = "0.1"
 tracing-log = "0.1"
