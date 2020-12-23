@@ -1,3 +1,4 @@
+use chrono::{FixedOffset, NaiveDate, NaiveDateTime, TimeZone};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -19,7 +20,7 @@ pub struct SiteData {
 pub struct Name {
     pub name: String,
     #[serde(rename = "$value")]
-    pub value: u8,
+    pub value: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -28,14 +29,33 @@ pub struct DateTime {
     pub name: String,
     pub zone: String,
     #[serde(rename = "UTCOffset")]
-    pub utc_offset: String,
-    pub year: u16,
+    pub utc_offset: i32,
+    pub year: i32,
     pub month: Name,
     pub day: Name,
-    pub hour: u8,
-    pub minute: u8,
+    pub hour: u32,
+    pub minute: u32,
     pub time_stamp: String,
     pub text_summary: String,
+}
+
+impl Into<NaiveDateTime> for DateTime {
+    fn into(self) -> NaiveDateTime {
+        NaiveDate::from_ymd(self.year, self.month.value, self.day.value).and_hms(
+            self.hour,
+            self.minute,
+            0,
+        )
+    }
+}
+
+impl Into<chrono::DateTime<FixedOffset>> for DateTime {
+    fn into(self) -> chrono::DateTime<FixedOffset> {
+        let hour = 3600;
+        FixedOffset::east(self.utc_offset * hour)
+            .ymd(self.year, self.month.value, self.day.value)
+            .and_hms(self.hour, self.minute, 0)
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -73,6 +93,7 @@ pub struct MetricWithUnits {
     pub unit_type: Option<String>,
     pub change: Option<f64>,
     pub tendency: Option<String>,
+    pub class: Option<String>,
     #[serde(rename = "$value")]
     pub value: Option<f64>,
 }
@@ -152,7 +173,7 @@ pub struct CloudPrecip {
 pub struct Forecast {
     pub period: Period,
     pub text_summary: String,
-    pub cloud_precip: CloudPrecip,
+    pub cloud_precip: Option<CloudPrecip>,
     pub abbreviated_forecast: AbbreviatedForecast,
     pub temperatures: Temperatures,
     pub winds: Winds,

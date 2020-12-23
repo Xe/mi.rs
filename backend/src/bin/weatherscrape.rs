@@ -32,9 +32,10 @@ fn main() -> Result<()> {
     let fin = DecodeReaderBytesBuilder::new()
         .encoding(Some(WINDOWS_1252))
         .build(resp.into_reader());
-    let data: web::canada_weather::SiteData = from_reader(fin)?;
+    let data: web::canada_weather::types::SiteData = from_reader(fin)?;
+    let data: web::canada_weather::Report = data.into();
 
-    println!("{:#?}", data);
+    println!("{}", serde_json::to_string_pretty(&data)?);
 
     Ok(())
 }
