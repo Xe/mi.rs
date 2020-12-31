@@ -14,6 +14,26 @@ table! {
 }
 
 table! {
+    orangeconnex_packages (tracking_number) {
+        tracking_number -> Text,
+        recieved -> Bool,
+    }
+}
+
+table! {
+    orangeconnex_traces (id) {
+        id -> Text,
+        tracking_number -> Text,
+        description -> Text,
+        city -> Nullable<Text>,
+        country -> Text,
+        time_recorded -> Text,
+        time_zone -> Text,
+        ts -> Integer,
+    }
+}
+
+table! {
     switches (id) {
         id -> Text,
         member_id -> Integer,
@@ -39,11 +59,14 @@ table! {
     }
 }
 
+joinable!(orangeconnex_traces -> orangeconnex_packages (tracking_number));
 joinable!(switches -> members (member_id));
 
 allow_tables_to_appear_in_same_query!(
     blogposts,
     members,
+    orangeconnex_packages,
+    orangeconnex_traces,
     switches,
     weather,
     webmentions,

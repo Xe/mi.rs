@@ -12,6 +12,7 @@ use rocket::{
 use rocket_contrib::json::Json;
 use std::io::Read;
 
+pub mod package_tracking;
 pub mod posse;
 pub mod switch;
 pub mod webmention;

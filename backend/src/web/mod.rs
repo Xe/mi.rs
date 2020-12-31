@@ -2,6 +2,7 @@ pub mod bridgy;
 pub mod canada_weather;
 pub mod discord_webhook;
 pub mod mastodon;
+pub mod orange_connex;
 pub mod pluralkit;
 pub mod switchcounter;
 pub mod twitter;

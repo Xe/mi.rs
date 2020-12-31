@@ -120,7 +120,7 @@ impl From<types::Forecast> for Forecast {
             } else {
                 None
             },
-            low: if f.temperatures.temperature.class.as_ref().unwrap() == "low" {
+            low: if f.temperatures.temperature.class.unwrap() == "low" {
                 f.temperatures.temperature.value
             } else {
                 None
