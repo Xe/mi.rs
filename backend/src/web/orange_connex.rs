@@ -66,7 +66,7 @@ pub struct Trace {
     pub opr_country: String,
     pub opr_time: String,
     pub opr_time_zone: String,
-    pub opr_timestamp: i32,
+    pub opr_timestamp: i64,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]

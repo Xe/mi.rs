@@ -70,9 +70,10 @@ fn main() -> Result<()> {
         .mount(
             "/api",
             routes![
-                api::package_tracking::orangeconnex::track,
-                api::package_tracking::orangeconnex::status,
+                api::package_tracking::orangeconnex::list,
                 api::package_tracking::orangeconnex::recieved,
+                api::package_tracking::orangeconnex::status,
+                api::package_tracking::orangeconnex::track,
                 api::posse::notify,
                 api::posse::refresh_blog,
                 api::switch::current_front,

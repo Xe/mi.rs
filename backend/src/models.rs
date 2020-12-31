@@ -73,7 +73,7 @@ pub struct Blogpost {
     pub title: String,
 }
 
-#[derive(Queryable, Associations, Insertable, AsChangeset)]
+#[derive(Queryable, Associations, Insertable, AsChangeset, Serialize)]
 #[table_name = "orangeconnex_packages"]
 pub struct OrangeConnexPackage {
     pub tracking_number: String,
@@ -104,7 +104,7 @@ impl OrangeConnexTrace {
             country: t.opr_country,
             time_recorded: t.opr_time,
             time_zone: t.opr_time_zone,
-            ts: t.opr_timestamp,
+            ts: t.opr_timestamp.try_into().unwrap_or(1337),
         }
     }
 }

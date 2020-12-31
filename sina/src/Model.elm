@@ -5,6 +5,7 @@ import Browser.Navigation as Nav
 import Http
 import Mi
 import Mi.POSSE
+import Mi.PackageTracking.OrangeConnex as OrangeConnex
 import Mi.Switch exposing (Switch)
 import Mi.WebMention exposing (WebMention)
 import Route exposing (Route, routeParser)
@@ -26,6 +27,9 @@ type alias Model =
     , switchByID : Maybe Switch
     , webMentionByID : Maybe WebMention
     , post : Mi.POSSE.Post
+    , ocTrackingID : Maybe String
+    , ocPackages : Maybe (List OrangeConnex.Package)
+    , ocTraces : Maybe (List OrangeConnex.Trace)
     }
 
 
@@ -47,10 +51,14 @@ type Msg
     | FetchSwitch String
     | NextSwitchesPage
     | PrevSwitchesPage
+    | FetchOCPackages
+    | FetchOCTraces String
     | ValidateToken (Result Http.Error Mi.TokenData)
     | ValidateSwitchByID (Result Http.Error Switch)
     | ValidateFront (Result Http.Error Switch)
     | ValidateSwitches (Result Http.Error (List Switch))
+    | ValidateOCPackages (Result Http.Error (List OrangeConnex.Package))
+    | ValidateOCTraces (Result Http.Error (List OrangeConnex.Trace))
     | ClearError
 
 
@@ -69,6 +77,9 @@ init _ url key =
       , switchByID = Nothing
       , webMentionByID = Nothing
       , post = Mi.POSSE.init
+      , ocTrackingID = Nothing
+      , ocPackages = Nothing
+      , ocTraces = Nothing
       }
     , Nav.pushUrl key "/login"
     )

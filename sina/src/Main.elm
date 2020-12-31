@@ -9,11 +9,14 @@ import Http
 import Json.Decode
 import Layout
 import Mi
+import Mi.PackageTracking.OrangeConnex
 import Mi.Switch
 import Mi.WebMention
 import Model exposing (Model, Msg(..), get, init)
 import Page.Index
 import Page.Login
+import Page.OrangeConnex
+import Page.Packages
 import Page.SwitchInfo
 import Page.Switches
 import Route exposing (Route(..), routeParser)
@@ -73,6 +76,20 @@ update msg model =
                     Json.Decode.list Mi.Switch.decoder
             )
 
+        FetchOCPackages ->
+            ( model
+            , get model Mi.PackageTracking.OrangeConnex.packageListURL <|
+                Mi.expectJson ValidateOCPackages <|
+                    Json.Decode.list Mi.PackageTracking.OrangeConnex.decodePackage
+            )
+
+        FetchOCTraces trackingID ->
+            ( { model | ocTrackingID = Just trackingID }
+            , get model (Mi.PackageTracking.OrangeConnex.packageStatusURL trackingID) <|
+                Mi.expectJson ValidateOCTraces <|
+                    Json.Decode.list Mi.PackageTracking.OrangeConnex.decodeTrace
+            )
+
         ValidateSwitchByID result ->
             if_okay result <|
                 \data ->
@@ -94,6 +111,16 @@ update msg model =
                     ( { model | tokenData = Just data }
                     , Nav.pushUrl model.navKey "/"
                     )
+
+        ValidateOCPackages result ->
+            if_okay result <|
+                \data ->
+                    ( { model | ocPackages = Just data }, Cmd.none )
+
+        ValidateOCTraces result ->
+            if_okay result <|
+                \data ->
+                    ( { model | ocTraces = Just data }, Cmd.none )
 
         ClickLink urlRequest ->
             case urlRequest of
@@ -123,6 +150,15 @@ view model =
 
                 SwitchID _ ->
                     Page.SwitchInfo.view model
+
+                Packages ->
+                    Page.Packages.view
+
+                OCPackages ->
+                    Page.OrangeConnex.viewList model
+
+                OCPackage packageID ->
+                    Page.OrangeConnex.viewPackage { model | ocTrackingID = Just packageID }
 
                 _ ->
                     Layout.template "Oh noes" [ p [] [ text "todo: implement this 404 page" ] ]

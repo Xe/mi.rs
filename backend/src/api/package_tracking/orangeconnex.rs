@@ -22,6 +22,21 @@ pub fn track(conn: MainDatabase, tn: StringBody, tok: paseto::Token) -> Result<S
     Ok(format!("now tracking package {}", tn))
 }
 
+#[get("/packages/orangeconnex")]
+#[instrument(skip(conn), err)]
+pub fn list(
+    conn: MainDatabase,
+    tok: paseto::Token,
+) -> Result<Json<Vec<models::OrangeConnexPackage>>> {
+    use schema::orangeconnex_packages;
+
+    Ok(Json(
+        orangeconnex_packages::table
+            .load::<models::OrangeConnexPackage>(&*conn)
+            .map_err(Error::Database)?,
+    ))
+}
+
 #[get("/packages/orangeconnex/status?<tn>")]
 #[instrument(skip(conn), err)]
 pub fn status(
@@ -29,10 +44,11 @@ pub fn status(
     tn: String,
     tok: paseto::Token,
 ) -> Result<Json<Vec<models::OrangeConnexTrace>>> {
-    use schema::orangeconnex_traces;
+    use schema::orangeconnex_traces::dsl::*;
 
     Ok(Json(
-        orangeconnex_traces::table
+        orangeconnex_traces
+            .filter(tracking_number.eq(tn))
             .load::<models::OrangeConnexTrace>(&*conn)
             .map_err(Error::Database)?,
     ))
