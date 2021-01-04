@@ -20,6 +20,19 @@ pub struct FrontChange {
     pub duration: Option<i32>,
 }
 
+impl From<(models::Switch, models::Member)> for FrontChange {
+    fn from(inp: (models::Switch, models::Member)) -> Self {
+        Self {
+            duration: inp.0.duration(),
+            id: inp.0.id,
+            who: inp.1.cmene,
+            img_url: inp.1.picurl,
+            started_at: inp.0.started_at,
+            ended_at: inp.0.ended_at,
+        }
+    }
+}
+
 #[get("/switches?<count>&<page>")]
 #[instrument(skip(conn), err)]
 pub fn list(
@@ -28,7 +41,10 @@ pub fn list(
     page: Option<i64>,
     tok: paseto::Token,
 ) -> Result<Json<Vec<FrontChange>>> {
-    use schema::{members, switches};
+    use schema::{
+        members,
+        switches::{self, dsl::started_at},
+    };
 
     let count = count.unwrap_or(30);
     let page = page.unwrap_or(0);
@@ -37,20 +53,13 @@ pub fn list(
 
     let result: Vec<FrontChange> = switches::table
         .inner_join(members::table)
-        .order_by(switches::dsl::started_at.desc())
+        .order_by(started_at.desc())
         .limit(count)
         .offset(count * (page - 1))
         .load::<(models::Switch, models::Member)>(&*conn)
         .map_err(Error::Database)?
         .into_iter()
-        .map(|(switch, member)| FrontChange {
-            duration: switch.duration(),
-            id: switch.id,
-            who: member.cmene,
-            img_url: member.picurl,
-            started_at: switch.started_at,
-            ended_at: switch.ended_at,
-        })
+        .map(Into::into)
         .collect();
 
     match result.len() {
@@ -72,14 +81,7 @@ pub fn current_front(conn: MainDatabase, tok: paseto::Token) -> Result<Json<Fron
         .map_err(Error::Database)?;
 
     match front.pop() {
-        Some((switch, member)) => Ok(Json(FrontChange {
-            duration: switch.duration(),
-            id: switch.id,
-            who: member.cmene,
-            img_url: member.picurl,
-            started_at: switch.started_at.round_subsecs(0),
-            ended_at: switch.ended_at.map(|time| time.round_subsecs(0)),
-        })),
+        Some(smem) => Ok(Json(smem.into())),
         None => Err(Error::NotFound),
     }
 }
@@ -174,18 +176,11 @@ pub fn switch(
 pub fn get(tok: paseto::Token, conn: MainDatabase, switch_id: String) -> Result<Json<FrontChange>> {
     use schema::{members, switches::dsl::switches};
 
-    let (switch, member): (models::Switch, models::Member) = switches
+    let smem: (models::Switch, models::Member) = switches
         .find(switch_id)
         .inner_join(members::table)
         .get_result(&*conn)
         .map_err(Error::Database)?;
 
-    Ok(Json(FrontChange {
-        duration: switch.duration(),
-        id: switch.id,
-        who: member.cmene,
-        img_url: member.picurl,
-        started_at: switch.started_at.round_subsecs(0),
-        ended_at: switch.ended_at.map(|time| time.round_subsecs(0)),
-    }))
+    Ok(Json(smem.into()))
 }
