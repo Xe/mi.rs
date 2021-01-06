@@ -37,7 +37,7 @@ let
     export DATABASE_URL=./mi.db
     export ROCKET_DATABASES='{ main_data = { url = "./mi.db" } }';
     ${composite}/bin/migrate_database
-    ${composite}/bin/bridgy_migrate
+    ${composite}/bin/bridgy_migrate || true
     export ROCKET_ASSET_PATH=${composite}/public
     exec ${composite}/bin/mi
   '';
