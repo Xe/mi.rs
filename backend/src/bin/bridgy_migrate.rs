@@ -31,29 +31,23 @@ fn main() -> Result<()> {
             let resp = ureq::get(&wm.source_url)
                 .set("User-Agent", crate::APPLICATION_NAME)
                 .set("Mi-Mentioned-Url", &wm.target_url)
-                .call();
+                .call()
+                .map_err(|why| {
+                    error!("can't fetch {}: {}", wm.source_url, why);
+                    why
+                })
+                .unwrap();
 
-            if resp.ok() {
-                let body = resp.into_string().unwrap();
-                let result = parse(&body).unwrap().unwrap();
-                info!("{:?}", result);
+            let body = resp.into_string().unwrap();
+            let result = parse(&body).unwrap().unwrap();
+            info!("{:?}", result);
 
-                diesel::update(webmentions.find(wm.id))
-                    .set(&models::UpdateWebMentionSource {
-                        source_url: result.target,
-                    })
-                    .execute(&conn)
-                    .unwrap();
-            } else {
-                error!(
-                    "can't fetch {}: {}",
-                    wm.source_url,
-                    match resp.synthetic_error() {
-                        Some(why) => web::Error::UReq(why.to_string()),
-                        None => web::Error::HttpStatus(resp.status()),
-                    }
-                );
-            }
+            diesel::update(webmentions.find(wm.id))
+                .set(&models::UpdateWebMentionSource {
+                    source_url: result.target,
+                })
+                .execute(&conn)
+                .unwrap();
         });
 
     Ok(())

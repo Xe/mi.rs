@@ -33,18 +33,12 @@ impl Client {
     pub fn toot(&self, body: String) -> Result {
         let url = &format!("{}/api/v1/statuses", self.instance_url);
 
-        let resp = ureq::post(url)
+        ureq::post(url)
             .set("Authorization", &format!("bearer {}", self.token))
             .set("User-Agent", crate::APPLICATION_NAME)
-            .send_form(&[("status", body.as_str())]);
+            .send_form(&[("status", body.as_str())])
+            .map_err(Error::UReq)?;
 
-        if resp.ok() {
-            Ok(())
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(())
     }
 }

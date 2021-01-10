@@ -75,18 +75,10 @@ impl Client {
         ))
         .set("Authorization", &self.api_token)
         .set("User-Agent", crate::APPLICATION_NAME)
-        .call();
+        .call()
+        .map_err(Error::UReq)?;
 
-        debug!("headers: {:?}", resp.headers_names());
-
-        if resp.ok() {
-            Ok(resp.into_json_deserialize()?)
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(resp.into_json()?)
     }
 
     #[instrument(err, skip(self))]
@@ -97,20 +89,14 @@ impl Client {
             .ok_or_else(|| Error::SystemmateMappingNotFound(member_name.clone()))?
             .clone();
 
-        let resp = ureq::post("https://api.pluralkit.me/v1/s/switches")
+        ureq::post("https://api.pluralkit.me/v1/s/switches")
             .set("Authorization", &self.api_token)
             .set("User-Agent", crate::APPLICATION_NAME)
             .send_json(serde_json::to_value(SwitchRequest {
                 members: vec![member],
-            })?);
+            })?)
+            .map_err(Error::UReq)?;
 
-        if resp.ok() {
-            Ok(())
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(())
     }
 }

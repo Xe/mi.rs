@@ -3,7 +3,8 @@ access logs. If this program is doing something you don't want it to do,
 please contact me at me@christine.website.
 
 This service is intended to act as a POSSE[1] syndication server for
-various services to various other services.
+various services to various other services. It also performs a lot of
+personal integrations between my data and cloud services.
 
 Every effort is being taken to ensure that the data going through this
 server is my own.

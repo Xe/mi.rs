@@ -52,21 +52,13 @@ impl Client {
             pub webhook: FrontAsk,
         }
 
-        let resp = ureq::post(&self.webhook_url).send_json(serde_json::to_value(Wrapper {
-            webhook: FrontAsk::default(),
-        })?);
+        let resp = ureq::post(&self.webhook_url)
+            .send_json(serde_json::to_value(Wrapper {
+                webhook: FrontAsk::default(),
+            })?)
+            .map_err(Error::UReq)?;
 
-        if resp.ok() {
-            Ok(resp.into_json_deserialize()?)
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => {
-                    error!("ureq error: {}", why);
-                    Error::UReq(why.to_string())
-                }
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(resp.into_json()?)
     }
 
     #[instrument(err, skip(self))]
@@ -76,20 +68,15 @@ impl Client {
             pub webhook: SwitchCommand,
         }
 
-        let resp = ureq::post(&self.webhook_url).send_json(serde_json::to_value(Wrapper {
-            webhook: SwitchCommand {
-                command: "switch".to_string(),
-                member_name: member_name,
-            },
-        })?);
+        let resp = ureq::post(&self.webhook_url)
+            .send_json(serde_json::to_value(Wrapper {
+                webhook: SwitchCommand {
+                    command: "switch".to_string(),
+                    member_name: member_name,
+                },
+            })?)
+            .map_err(Error::UReq)?;
 
-        if resp.ok() {
-            Ok(resp.into_json_deserialize()?)
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(resp.into_json()?)
     }
 }

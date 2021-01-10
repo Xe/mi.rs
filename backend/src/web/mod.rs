@@ -21,7 +21,10 @@ pub enum Error {
     Serde(#[from] serde_json::Error),
 
     #[error("ureq error: {0}")]
-    UReq(String),
+    UReq(#[from] ureq::Error),
+
+    #[error("old ureq error: {0}")]
+    OldUReq(String),
 
     #[error("http unsuccessful: {0}")]
     HttpStatus(u16),

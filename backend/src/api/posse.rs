@@ -1,7 +1,7 @@
 use super::Result;
 use crate::{
     models, paseto, schema,
-    web::{DiscordWebhook, Error as WebError, Mastodon, Result as WebResult, Twitter},
+    web::{DiscordWebhook, Mastodon, Result as WebResult, Twitter},
     MainDatabase,
 };
 use diesel::prelude::*;
@@ -55,16 +55,9 @@ impl Into<models::Blogpost> for Item {
 pub fn read_jsonfeed(url: String) -> WebResult<Jsonfeed> {
     let resp = ureq::get(&url)
         .set("User-Agent", crate::APPLICATION_NAME)
-        .call();
+        .call()?;
 
-    if resp.ok() {
-        Ok(resp.into_json_deserialize()?)
-    } else {
-        Err(match resp.synthetic_error() {
-            Some(why) => WebError::UReq(why.to_string()),
-            None => WebError::HttpStatus(resp.status()),
-        })
-    }
+    Ok(resp.into_json()?)
 }
 
 #[instrument(skip(dw, tw, ma), err)]

@@ -45,17 +45,11 @@ impl Client {
 
     #[instrument(skip(self), err)]
     pub fn send(&self, body: String) -> Result<()> {
-        let resp = ureq::post(&self.webhook_url)
+        ureq::post(&self.webhook_url)
             .set("User-Agent", crate::APPLICATION_NAME)
-            .send_json(serde_json::to_value(Body::new(body))?);
+            .send_json(serde_json::to_value(Body::new(body))?)
+            .map_err(Error::UReq)?;
 
-        if resp.ok() {
-            Ok(())
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
-                None => Error::HttpStatus(resp.status()),
-            })
-        }
+        Ok(())
     }
 }

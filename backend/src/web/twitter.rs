@@ -46,7 +46,7 @@ impl Client {
             Ok(())
         } else {
             Err(match resp.synthetic_error() {
-                Some(why) => Error::UReq(why.to_string()),
+                Some(why) => Error::OldUReq(why.to_string()),
                 None => Error::HttpStatus(resp.status()),
             })
         }

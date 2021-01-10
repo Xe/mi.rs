@@ -97,6 +97,12 @@ pub enum Error {
 
     #[error("readability error: {0}")]
     Readability(#[from] readability_fork::error::Error),
+
+    #[error("ureq error: {0}")]
+    UReq(#[from] ureq::Error),
+
+    #[error("futures error: {0}")]
+    Futures(#[from] futures_io::Error),
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;

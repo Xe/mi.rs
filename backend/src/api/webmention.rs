@@ -1,7 +1,7 @@
 use super::{Error, Result};
 use crate::{
     models, paseto, schema,
-    web::{self, discord_webhook::Client as DiscordWebhook},
+    web::{self, discord_webhook::Client as DiscordWebhook, Error as WebError},
     MainDatabase,
 };
 use diesel::prelude::*;
@@ -60,22 +60,15 @@ impl WebMention {
         let resp = ureq::get(&self.source)
             .set("User-Agent", crate::APPLICATION_NAME)
             .set("Mi-Mentioned-Url", &self.target)
-            .call();
+            .call()?;
 
-        if resp.ok() {
-            let body = resp
-                .into_string()
-                .map_err(|why| Error::Web(web::Error::FuturesIO(why)))?;
-            Ok(extractor::extract(
-                &mut body.as_bytes(),
-                &url::Url::parse(&self.source)?,
-            )?)
-        } else {
-            Err(match resp.synthetic_error() {
-                Some(why) => Error::Web(web::Error::UReq(why.to_string())),
-                None => Error::Web(web::Error::HttpStatus(resp.status())),
-            })
-        }
+        let body = resp
+            .into_string()
+            .map_err(|why| Error::Web(web::Error::FuturesIO(why)))?;
+        Ok(extractor::extract(
+            &mut body.as_bytes(),
+            &url::Url::parse(&self.source)?,
+        )?)
     }
 }
 
@@ -231,25 +224,18 @@ pub fn bridgy_expand(conn: MainDatabase, wm: models::WebMention) -> Result {
     let resp = ureq::get(&wm.source_url)
         .set("User-Agent", crate::APPLICATION_NAME)
         .set("Mi-Mentioned-Url", &wm.target_url)
-        .call();
+        .call()
+        .map_err(WebError::UReq)?;
 
-    if resp.ok() {
-        let body = resp.into_string().unwrap();
-        let result = parse(&body).unwrap().unwrap();
-        debug!("{:?}", result);
+    let body: String = resp.into_string()?;
+    let result = parse(&body).unwrap().unwrap();
 
-        diesel::update(webmentions.find(wm.id))
-            .set(&models::UpdateWebMentionSource {
-                source_url: result.target,
-            })
-            .execute(&*conn)
-            .map_err(Error::Database)
-            .unwrap();
-        Ok(())
-    } else {
-        Err(match resp.synthetic_error() {
-            Some(why) => Error::Web(web::Error::UReq(why.to_string())),
-            None => Error::Web(web::Error::HttpStatus(resp.status())),
+    diesel::update(webmentions.find(wm.id))
+        .set(&models::UpdateWebMentionSource {
+            source_url: result.target,
         })
-    }
+        .execute(&*conn)
+        .map_err(Error::Database)
+        .unwrap();
+    Ok(())
 }

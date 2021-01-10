@@ -99,14 +99,8 @@ pub fn get(tracking_number: String) -> Result<Info> {
     .set("Cache-Control", "max-age=0")
     .send_json(serde_json::to_value(PostBody {
         tracking_numbers: vec![tracking_number],
-    })?);
+    })?)
+    .map_err(Error::UReq)?;
 
-    if resp.ok() {
-        Ok(resp.into_json_deserialize()?)
-    } else {
-        Err(match resp.synthetic_error() {
-            Some(why) => Error::UReq(why.to_string()),
-            None => Error::HttpStatus(resp.status()),
-        })
-    }
+    Ok(resp.into_json()?)
 }

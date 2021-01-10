@@ -17,17 +17,13 @@ fn main() -> Result<()> {
 
     info!("{} weather importer starting up", mi::APPLICATION_NAME);
 
-    let resp = ureq::get(WEATHER_URL).set("User-Agent", WEATHER_URL).call();
-
-    if !resp.ok() {
-        panic!(
-            "{}",
-            match resp.synthetic_error() {
-                Some(why) => why.to_string(),
-                None => resp.status_line().to_string(),
-            }
-        );
-    }
+    let resp = ureq::get(WEATHER_URL)
+        .set("User-Agent", WEATHER_URL)
+        .call()
+        .map_err(|why| {
+            panic!("{}", why.to_string());
+            why
+        })?;
 
     let fin = DecodeReaderBytesBuilder::new()
         .encoding(Some(WINDOWS_1252))
