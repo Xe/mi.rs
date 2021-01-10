@@ -8,14 +8,18 @@ in pkgs.mkShell rec {
   buildInputs = with pkgs; [
     # rust
     rust
+    cargo-watch
+
+    # system deps
     pkgconfig
     openssl
     cmake
     zlib
-    diesel-cli
     sqlite
     libsodium
-    cargo-watch
+
+    # tools
+    diesel-cli
 
     # elm
     elmPackages.elm

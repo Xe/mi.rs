@@ -39,7 +39,7 @@ let
     ${composite}/bin/migrate_database
     ${composite}/bin/bridgy_migrate || true
     export ROCKET_ASSET_PATH=${composite}/public
-    exec ${composite}/bin/mi
+    exec ${composite}/bin/web
   '';
 in symlinkJoin {
   name = "mi";

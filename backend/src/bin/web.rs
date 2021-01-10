@@ -11,9 +11,9 @@ use rocket_contrib::helmet::SpaceHelmet;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 use rocket_prometheus::PrometheusMetrics;
 
-use ::mi::{api, frontend, paseto, rocket_trace::*, web::*, MainDatabase, APPLICATION_NAME};
-
-mod wellknown;
+use ::mi::{
+    api, frontend, paseto, rocket_trace::*, web::*, wellknown, MainDatabase, APPLICATION_NAME,
+};
 
 fn main() -> Result<()> {
     color_eyre::install()?;
@@ -27,7 +27,6 @@ fn main() -> Result<()> {
         "http://mi.akua",
     ]);
 
-    // You can also deserialize this
     let cors = rocket_cors::CorsOptions {
         allowed_origins,
         allowed_methods: vec![Method::Get, Method::Post]

@@ -25,6 +25,7 @@ pub mod paseto;
 pub mod rocket_trace;
 pub mod schema;
 pub mod web;
+pub mod wellknown;
 
 #[database("main_data")]
 pub struct MainDatabase(SqliteConnection);
