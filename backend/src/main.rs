@@ -13,10 +13,7 @@ use rocket_prometheus::PrometheusMetrics;
 
 use ::mi::{api, frontend, paseto, rocket_trace::*, web::*, MainDatabase, APPLICATION_NAME};
 
-#[get("/.within/botinfo")]
-fn botinfo() -> &'static str {
-    include_str!("./botinfo.txt")
-}
+mod wellknown;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
@@ -62,11 +59,15 @@ fn main() -> Result<()> {
             if let Ok(ref mut n) = sdnotify::SdNotify::from_env() {
                 let _ = n
                     .notify_ready()
-                    .map_err(|why| error!("can't signal readiness to systemd: {}", why));
+                    .map_err(|why| error!("can't signal readiness to systemd: {}", why))
+                    .unwrap();
             }
         }))
         .mount("/metrics", prometheus)
-        .mount("/", routes![botinfo])
+        .mount(
+            "/",
+            routes![wellknown::botinfo, wellknown::robots, wellknown::security],
+        )
         .mount(
             "/api",
             routes![
