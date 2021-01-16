@@ -117,6 +117,9 @@ pub fn lookup_target(conn: MainDatabase, target: String) -> Result<Json<Vec<WebM
             .map_err(Error::Database)?
             .into_iter()
             .map(Into::into)
+            .filter(|wm| {
+                !wm.source.contains("like/twitter") || !wm.source.contains("like/mastodon")
+            })
             .collect::<Vec<WebMention>>(),
     ))
 }
