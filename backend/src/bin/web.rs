@@ -54,6 +54,7 @@ fn main() -> Result<()> {
         .attach(PluralKit::fairing())
         .attach(SwitchCounter::fairing())
         .attach(Twitter::fairing())
+        .attach(Lemmy::fairing())
         .attach(AdHoc::on_launch("systemd readiness", |_| {
             if let Ok(ref mut n) = sdnotify::SdNotify::from_env() {
                 let _ = n

@@ -44,4 +44,6 @@ in pkgs.mkShell rec {
   # libsodium-sys
   SODIUM_USE_PKG_CONFIG = "1";
   SODIUM_SHARED = "1";
+
+  RUST_SRC_PATH = "${pkgs.latest.rustChannels.nightly.rust-src}/lib/rustlib/src/rust/library";
 }

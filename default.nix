@@ -1,4 +1,5 @@
-{ sources ? import ./nix/sources.nix, pkgs ? import sources.nixpkgs { } }:
+{ sources ? import ./nix/sources.nix, pkgs ?
+  import sources.nixpkgs { overlays = [ (import sources.nixpkgs-mozilla) ]; } }:
 with pkgs;
 let
   backend = callPackage ./backend { inherit sources pkgs; };
