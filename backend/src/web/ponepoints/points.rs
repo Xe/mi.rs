@@ -1,13 +1,26 @@
 use super::Client;
 use crate::web::Result;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 impl Client {
     #[instrument(err, skip(self))]
-    pub fn get_point_granted_for(&self, slug: String) -> Result<Vec<PointGrant>> {
+    pub fn get_point_granted_for(&self, pone: super::PoneData) -> Result<Vec<PointGrant>> {
+        Ok(
+            ureq::get(&format!("https://points.horse{}", pone.links.points))
+                .set("Authorization", &format!("Api-Key {}", self.token.clone()))
+                .set("User-Agent", crate::APPLICATION_NAME)
+                .set("Accept", "application/json")
+                .call()?
+                .into_json::<PointList>()?
+                .unwrap(),
+        )
+    }
+
+    #[instrument(err, skip(self))]
+    pub fn get_point_grants_for(&self, pone: super::PoneData) -> Result<Vec<PointGrant>> {
         Ok(ureq::get(&format!(
-            "https://points.horse/api/v1/pones/{}/points.json",
-            slug
+            "https://points.horse{}",
+            pone.links.granted_points
         ))
         .set("Authorization", &format!("Api-Key {}", self.token.clone()))
         .set("User-Agent", crate::APPLICATION_NAME)
@@ -18,35 +31,41 @@ impl Client {
     }
 
     #[instrument(err, skip(self))]
-    pub fn get_point_grants_for(&self, slug: String) -> Result<Vec<PointGrant>> {
-        Ok(ureq::get(&format!(
-            "https://points.horse/api/v1/pones/{}/granted.json",
-            slug
-        ))
-        .set("Authorization", &format!("Api-Key {}", self.token.clone()))
-        .set("User-Agent", crate::APPLICATION_NAME)
-        .set("Accept", "application/json")
-        .call()?
-        .into_json::<PointList>()?
-        .unwrap())
+    pub fn get_grant_details(&self, pg: PointGrant) -> Result<PointGrant> {
+        Ok(
+            ureq::get(&format!("https://points.horse{}", pg.links.myself))
+                .set("Authorization", &format!("Api-Key {}", self.token.clone()))
+                .set("User-Agent", crate::APPLICATION_NAME)
+                .set("Accept", "application/json")
+                .call()?
+                .into_json::<PointWrapper>()?
+                .unwrap(),
+        )
     }
 
     #[instrument(err, skip(self))]
-    pub fn get_grant_details(&self, pone_slug: String, point_id: String) -> Result<PointGrant> {
-        Ok(ureq::get(&format!(
-            "https://points.horse/api/v1/pones/{}/points/{}.json",
-            pone_slug, point_id
+    pub fn give_points(
+        &self,
+        pone_slug: String,
+        count: i32,
+        message: String,
+    ) -> Result<PointGrant> {
+        Ok(ureq::post(&format!(
+            "https://points.horse/api/v1/pones/{}/points/give.json",
+            pone_slug
         ))
         .set("Authorization", &format!("Api-Key {}", self.token.clone()))
         .set("User-Agent", crate::APPLICATION_NAME)
         .set("Accept", "application/json")
-        .call()?
+        .send_json(serde_json::to_value(&PointRequestWrapper {
+            point: PointRequest { count, message },
+        })?)?
         .into_json::<PointWrapper>()?
         .unwrap())
     }
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct PointGrant {
     pub id: i32,
     pub count: i32,
@@ -55,7 +74,7 @@ pub struct PointGrant {
     pub message: String,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct PointLinks {
     #[serde(rename = "self")]
     pub myself: String,
@@ -83,6 +102,17 @@ impl PointWrapper {
     pub fn unwrap(self) -> PointGrant {
         self.point
     }
+}
+
+#[derive(Clone, Serialize)]
+struct PointRequest {
+    count: i32,
+    message: String,
+}
+
+#[derive(Clone, Serialize)]
+struct PointRequestWrapper {
+    point: PointRequest,
 }
 
 #[cfg(test)]

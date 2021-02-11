@@ -53,7 +53,7 @@ pub struct Pone {
     pub pone: PoneData,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct PoneData {
     pub slug: String,
     pub avatar_url: Option<String>,
@@ -65,7 +65,7 @@ pub struct PoneData {
     pub points_count: i32,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct PoneLinks {
     #[serde(rename = "self")]
     pub myself: String,
