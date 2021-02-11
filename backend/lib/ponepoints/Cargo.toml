@@ -1,0 +1,21 @@
+[package]
+name = "ponepoints"
+version = "0.1.0"
+authors = ["Christine Dodrill <me@christine.website>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+mi = ["rocket"]
+
+[dependencies]
+ureq = { version = "2", features = ["json", "charset"] }
+serde_json = "^1"
+serde = { version = "1", features = ["derive"] }
+tracing = "0.1"
+
+rocket = { version = "0.4", optional = true }
+
+mi-web = { path = "../mi-web" }

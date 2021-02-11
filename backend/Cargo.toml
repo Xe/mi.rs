@@ -39,6 +39,10 @@ twapi-ureq = "0.1.5"
 ureq = { version = "2", features = ["json", "charset"] }
 url = "2"
 
+# local
+mi-web = { path = "./lib/mi-web" }
+ponepoints = { path = "./lib/ponepoints", features = ["mi"] }
+
 [dependencies.askama]
 version = "0.10"
 features = [ "with-rocket" ]
@@ -54,3 +58,9 @@ features = ["json", "diesel_sqlite_pool", "helmet", "serve"]
 
 [profile.release]
 lto = true
+
+[workspace]
+members = [
+  "./lib/*",
+  "./tools/*"
+]

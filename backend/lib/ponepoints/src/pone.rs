@@ -1,5 +1,5 @@
 use super::Client;
-use crate::web::Result;
+use mi_web::Result;
 use serde::Deserialize;
 
 impl Client {

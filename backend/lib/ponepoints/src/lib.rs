@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate tracing;
+
+#[cfg(feature = "mi")]
 use rocket::fairing::AdHoc;
 
 mod points;
@@ -6,8 +10,11 @@ mod pone;
 pub use points::*;
 pub use pone::*;
 
+pub(crate) use mi_web::APPLICATION_NAME;
+
 pub struct Client {
     token: String,
+    #[allow(dead_code)]
     validation: String,
 }
 
@@ -16,6 +23,7 @@ impl Client {
         Self { token, validation }
     }
 
+    #[cfg(feature = "mi")]
     pub fn fairing() -> AdHoc {
         AdHoc::on_attach("pone points", |rocket| {
             let cfg = rocket.config();

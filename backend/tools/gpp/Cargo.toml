@@ -1,0 +1,19 @@
+[package]
+name = "gpp"
+version = "0.1.0"
+authors = ["Christine Dodrill <me@christine.website>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = [ "derive" ] }
+structopt = { version = "0.3", default-features = false }
+tabular = "0.1.4"
+toml = "0.5"
+xdg = "2.2"
+
+# local
+mi-web = { path = "../../lib/mi-web" }
+ponepoints = { path = "../../lib/ponepoints" }
