@@ -27,8 +27,7 @@ enum Cmd {
 }
 
 fn main() -> anyhow::Result<()> {
-    let xdg_dirs =
-        BaseDirectories::with_prefix("within-gpp").expect("able to find basedirs for within-gpp");
+    let xdg_dirs = BaseDirectories::with_prefix("within-gpp")?;
     let config_path = xdg_dirs.place_config_file("gaftercuha.toml")?;
     let mut fin = File::open(&config_path)?;
     let mut datni = String::new();
@@ -47,7 +46,6 @@ fn main() -> anyhow::Result<()> {
             println!("Giftable Points: {}", pone.giftable_points_count.unwrap());
             println!("Points:          {}", pone.points_count);
         }
-        #[allow(dead_code)]
         Cmd::Grant {
             to,
             amount,
