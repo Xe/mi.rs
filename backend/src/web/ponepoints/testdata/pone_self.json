@@ -1,0 +1,19 @@
+{
+  "pone": {
+    "slug": "twana_gottlieb-37",
+    "avatar_url": null,
+    "daily_giftable_points_count": 3,
+    "giftable_points_count": 3,
+    "joined_at": "2021-02-09T05:49:16.062Z",
+    "links": {
+      "self": "/api/v1/pones/twana_gottlieb-37.json",
+      "page": "/pones/twana_gottlieb-37",
+      "achievements": "/api/v1/pones/twana_gottlieb-37/achievements.json",
+      "points": "/api/v1/pones/twana_gottlieb-37/points.json",
+      "granted_points": "/api/v1/pones/twana_gottlieb-37/points/granted.json",
+      "groups": "/api/v1/pones/twana_gottlieb-37/groups.json"
+    },
+    "name": "twana_gottlieb 37",
+    "points_count": 0
+  }
+}

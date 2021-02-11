@@ -5,6 +5,7 @@ pub mod lemmy;
 pub mod mastodon;
 pub mod orange_connex;
 pub mod pluralkit;
+pub mod ponepoints;
 pub mod switchcounter;
 pub mod twitter;
 

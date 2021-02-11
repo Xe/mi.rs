@@ -1,0 +1,43 @@
+{
+  "points": [
+    {
+      "id": 909,
+      "count": 3,
+      "granted_at": "2021-02-11T01:08:26.253Z",
+      "links": {
+        "self": "/api/v1/pones/lon_schumm-14/points/909.json",
+        "pone": "/api/v1/pones/lon_schumm-14.json",
+        "granted_by": "/api/v1/pones/frieda-15.json"
+      },
+      "message": "Plaid tilde loko vhs you probably haven't heard of them food truck keffiyeh."
+    },
+    {
+      "id": 910,
+      "count": 2,
+      "granted_at": "2021-02-11T01:08:26.255Z",
+      "links": {
+        "self": "/api/v1/pones/lon_schumm-14/points/910.json",
+        "pone": "/api/v1/pones/lon_schumm-14.json",
+        "granted_by": "/api/v1/pones/lucy-16.json"
+      },
+      "message": "Kale chips scenester everyday pinterest polaroid franzen."
+    },
+    {
+      "id": 911,
+      "count": 2,
+      "granted_at": "2021-02-11T01:08:26.258Z",
+      "links": {
+        "self": "/api/v1/pones/lon_schumm-14/points/911.json",
+        "pone": "/api/v1/pones/lon_schumm-14.json",
+        "granted_by": "/api/v1/pones/melonie-17.json"
+      },
+      "message": "Banjo williamsburg knausgaard street gluten-free church-key 8-bit."
+    }
+  ],
+  "meta": {
+    "links": {
+      "pone": "/api/v1/pones/lon_schumm-14.json",
+      "give_points": "/api/v1/pones/lon_schumm-14/points/give.json"
+    }
+  }
+}

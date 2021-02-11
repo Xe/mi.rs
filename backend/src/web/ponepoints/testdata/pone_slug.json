@@ -1,0 +1,17 @@
+{
+  "pone": {
+    "slug": "kandi-lynch-35",
+    "avatar_url": "/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaHBGUT09IiwiZXhwIjpudWxsLCJwdXIiOiJibG9iX2lkIn19--162c7a772d5f54b74b1e5ed7e4342f430a565bda/avatar.png",
+    "joined_at": "2021-02-09T05:49:16.043Z",
+    "links": {
+      "self": "/api/v1/pones/kandi-lynch-35.json",
+      "page": "/pones/kandi-lynch-35",
+      "achievements": "/api/v1/pones/kandi-lynch-35/achievements.json",
+      "points": "/api/v1/pones/kandi-lynch-35/points.json",
+      "granted_points": "/api/v1/pones/kandi-lynch-35/points/granted.json",
+      "groups": "/api/v1/pones/kandi-lynch-35/groups.json"
+    },
+    "name": "kandi.lynch 35",
+    "points_count": 0
+  }
+}
