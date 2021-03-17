@@ -165,8 +165,8 @@ pub fn switch(
 
     info!(from = &member.cmene[..], to = &to.cmene[..], "switched");
 
-    sc.switch(to.cmene.clone())?;
     pk.switch(to.cmene.clone())?;
+    sc.switch(to.cmene.clone())?;
 
     Ok(to.cmene)
 }
