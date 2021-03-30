@@ -6,6 +6,16 @@ table! {
 }
 
 table! {
+    indieauth_codes (code) {
+        code -> Text,
+        client_id -> Text,
+        redirect_uri -> Text,
+        state -> Text,
+        response_type -> Text,
+    }
+}
+
+table! {
     members (id) {
         id -> Integer,
         cmene -> Text,
@@ -76,6 +86,7 @@ joinable!(switches -> members (member_id));
 
 allow_tables_to_appear_in_same_query!(
     blogposts,
+    indieauth_codes,
     members,
     orangeconnex_packages,
     orangeconnex_traces,

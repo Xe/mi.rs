@@ -1,13 +1,6 @@
 use super::{Error, Result};
-use crate::{
-    paseto::{Keypair, Token},
-    MainDatabase,
-};
-use paseto::tokens::{validate_public_token, PasetoPublicKey};
-use rocket::{
-    http::{Cookie, Cookies},
-    State,
-};
+use crate::MainDatabase;
+use rocket::http::{Cookie, Cookies};
 use rocket_contrib::json::Json;
 use serde::Serialize;
 
@@ -17,7 +10,7 @@ pub struct Me {
 }
 
 #[get("/auth?<me>&<client_id>&<redirect_uri>&<state>&<response_type>")]
-#[instrument(skip(db, cookies, kp), err)]
+#[instrument(skip(db, cookies), err)]
 pub fn auth(
     db: MainDatabase,
     me: String,
@@ -25,9 +18,9 @@ pub fn auth(
     redirect_uri: String,
     state: String,
     response_type: String,
-    kp: State<Keypair>,
     mut cookies: Cookies,
 ) -> Result {
+    let _ = db;
     match response_type.as_str() {
         "code" | "id" => {}
         _ => return Err(Error::WrongIndieAuthResponseType(response_type)),
@@ -41,25 +34,16 @@ pub fn auth(
 }
 
 #[get("/auth?<code>&<redirect_uri>&<client_id>")]
-#[instrument(skip(db, cookies, paseto_key, code), err)]
+#[instrument(skip(db, code), err)]
 pub fn send_code(
     db: MainDatabase,
     client_id: String,
     redirect_uri: String,
     code: String,
-    paseto_key: State<PasetoPublicKey>,
-    mut cookies: Cookies,
 ) -> Result<Json<Me>> {
-    let val = validate_public_token(&code, None, &*paseto_key)
-        .map_err(|why| Error::PasetoValidationError(format!("{}", why)))?;
-
-    let tok: Token = serde_json::from_value(val)?;
-
+    let _ = db;
+    let _ = code;
     Ok(Json(Me {
-        me: cookies
-            .get_private("me")
-            .ok_or(Error::NotFound)?
-            .value()
-            .to_string(),
+        me: "https://christine.website".to_string(),
     }))
 }
