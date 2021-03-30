@@ -71,6 +71,7 @@ fn main() -> Result<()> {
         .mount(
             "/api",
             routes![
+                api::indieauth::auth,
                 api::package_tracking::orangeconnex::list,
                 api::package_tracking::orangeconnex::recieved,
                 api::package_tracking::orangeconnex::status,
@@ -88,6 +89,7 @@ fn main() -> Result<()> {
                 api::webmention::list,
                 api::get_members,
                 api::token_info,
+                api::token_mint,
                 api::tweet,
                 api::toot,
             ],

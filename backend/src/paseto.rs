@@ -1,3 +1,4 @@
+use crate::api::Error;
 use paseto::tokens::{validate_public_token, PasetoPublicKey};
 use paseto::PasetoBuilder;
 use ring::signature::Ed25519KeyPair;
@@ -23,18 +24,36 @@ pub fn ed25519_keypair() -> AdHoc {
         let token = PasetoBuilder::new()
             .set_ed25519_key(kp)
             .set_issued_at(None)
-            .set_issuer("manual API call".into())
-            .set_audience("wizards".into())
+            .set_issuer("mi startup".into())
+            .set_audience("https://mi.within.website".into())
             .set_jti(generate_ulid_string())
-            .set_subject("Within".into())
+            .set_subject("https://mi.within.website".into())
+            .set_claim(
+                "scopes".into(),
+                serde_json::to_value(vec!["debug:all"]).unwrap(),
+            )
             .build()
             .unwrap();
         debug!("token: {}", token);
 
-        Ok(rocket.manage(PasetoPublicKey::ED25519KeyPair(
-            Ed25519KeyPair::from_seed_and_public_key(&private, &public).unwrap(),
-        )))
+        Ok(rocket
+            .manage(PasetoPublicKey::ED25519KeyPair(
+                Ed25519KeyPair::from_seed_and_public_key(&private, &public).unwrap(),
+            ))
+            .manage(Keypair { public, private }))
     })
+}
+
+#[derive(Debug, Clone)]
+pub struct Keypair {
+    public: Vec<u8>,
+    private: Vec<u8>,
+}
+
+impl Keypair {
+    pub fn ed25519_keypair(&self) -> Ed25519KeyPair {
+        Ed25519KeyPair::from_seed_and_public_key(&self.private, &self.public).unwrap()
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -43,10 +62,12 @@ pub struct Token {
     pub sub: String,
     pub aud: String,
     pub iss: String,
+    pub iat: String,
+    pub scopes: Option<Vec<String>>,
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for Token {
-    type Error = ();
+    type Error = crate::api::Error;
 
     fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
         let keys: Vec<_> = request.headers().get("authorization").collect();
@@ -58,16 +79,26 @@ impl<'a, 'r> FromRequest<'a, 'r> for Token {
                 match validate_public_token(tok, None, &paseto_key) {
                     Ok(val) => {
                         let tok: Token = serde_json::from_value(val).unwrap();
-                        info!(id = &tok.jti[..], "token used");
+                        info!(
+                            id = &tok.jti[..],
+                            iss = &tok.iss[..],
+                            sub = &tok.sub[..],
+                            aud = &tok.aud[..],
+                            "token used"
+                        );
+
                         Outcome::Success(tok)
                     }
                     Err(why) => {
                         error!("paseto error: {}", why);
-                        Outcome::Failure((Status::Unauthorized, ()))
+                        Outcome::Failure((
+                            Status::Unauthorized,
+                            Error::PasetoValidationError(format!("{}", why)),
+                        ))
                     }
                 }
             }
-            _ => Outcome::Failure((Status::Unauthorized, ())),
+            _ => Outcome::Failure((Status::Unauthorized, Error::NoPasetoInRequest)),
         }
     }
 }

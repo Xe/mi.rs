@@ -1,4 +1,5 @@
 use crate::{models, paseto, schema, web, MainDatabase};
+use ::paseto::PasetoBuilder;
 use diesel::prelude::*;
 use rocket::{
     data::{self, FromDataSimple},
@@ -10,8 +11,10 @@ use rocket::{
     Response, State,
 };
 use rocket_contrib::json::Json;
+use rusty_ulid::generate_ulid_string;
 use std::io::Read;
 
+pub mod indieauth;
 pub mod package_tracking;
 pub mod posse;
 pub mod switch;
@@ -31,6 +34,30 @@ pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<mo
 #[get("/token/info")]
 pub fn token_info(tok: paseto::Token) -> Json<paseto::Token> {
     Json(tok)
+}
+
+#[post("/token/mint?<aud>&<sub>")]
+#[instrument(skip(kp), err)]
+pub fn token_mint(
+    tok: paseto::Token,
+    kp: State<paseto::Keypair>,
+    aud: String,
+    sub: String,
+) -> Result<String> {
+    let kp = kp.inner().ed25519_keypair();
+
+    PasetoBuilder::new()
+        .set_ed25519_key(kp)
+        .set_issued_at(None)
+        .set_issuer(format!("api call from {}", tok.sub))
+        .set_audience(aud)
+        .set_jti(generate_ulid_string())
+        .set_subject(sub)
+        .build()
+        .map_err(|why| {
+            error!("can't make paseto: {}", why);
+            Error::PasetoCreationError(format!("{}", why))
+        })
 }
 
 #[post("/tweet", data = "<body>")]
@@ -103,6 +130,21 @@ pub enum Error {
 
     #[error("futures error: {0}")]
     Futures(#[from] futures_io::Error),
+
+    #[error("paseto creation error: {0}")]
+    PasetoCreationError(String),
+
+    #[error("paseto validation error: {0}")]
+    PasetoValidationError(String),
+
+    #[error("no paseto in request")]
+    NoPasetoInRequest,
+
+    #[error("wrong indieauth response type: {0}")]
+    WrongIndieAuthResponseType(String),
+
+    #[error("json error: {0}")]
+    JsonError(#[from] serde_json::Error),
 }
 
 pub type Result<T = ()> = std::result::Result<T, Error>;
@@ -112,7 +154,9 @@ impl<'a> Responder<'a> for Error {
         error!("{}", self);
         match self {
             Error::NotFound => Err(Status::NotFound),
-            Error::InvalidWebMention(_) | Error::SameFronter(_) => Err(Status::BadRequest),
+            Error::InvalidWebMention(_)
+            | Error::SameFronter(_)
+            | Error::WrongIndieAuthResponseType(_) => Err(Status::BadRequest),
             _ => Err(Status::InternalServerError),
         }
     }

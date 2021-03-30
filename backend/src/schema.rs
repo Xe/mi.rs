@@ -43,6 +43,18 @@ table! {
 }
 
 table! {
+    tokens (id) {
+        id -> Text,
+        sub -> Text,
+        aud -> Text,
+        iss -> Text,
+        iat -> Text,
+        exp -> Nullable<Integer>,
+        valid -> Nullable<Integer>,
+    }
+}
+
+table! {
     weather (ts) {
         ts -> Timestamp,
         region -> Text,
@@ -68,6 +80,7 @@ allow_tables_to_appear_in_same_query!(
     orangeconnex_packages,
     orangeconnex_traces,
     switches,
+    tokens,
     weather,
     webmentions,
 );

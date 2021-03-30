@@ -60,6 +60,18 @@ pub struct WebMention {
     pub title: Option<String>,
 }
 
+#[derive(Queryable, Associations, Insertable, Clone)]
+#[table_name = "tokens"]
+pub struct Token {
+    pub id: String,
+    pub sub: String,
+    pub aud: String,
+    pub iss: String,
+    pub iat: String,
+    pub exp: Option<i32>,
+    pub valid: Option<i32>,
+}
+
 #[derive(AsChangeset)]
 #[table_name = "webmentions"]
 pub struct UpdateWebMentionSource {

@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS tokens
+  ( id TEXT UNIQUE NOT NULL PRIMARY KEY
+  , sub TEXT NOT NULL
+  , aud TEXT NOT NULL
+  , iss TEXT NOT NULL
+  , iat TEXT NOT NULL
+  , exp INTEGER
+  , valid INTEGER
+  );
