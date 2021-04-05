@@ -27,6 +27,7 @@ fn main() -> Result<()> {
         "https://mi.within.website",
         "http://localhost:8000",
         "http://mi.akua",
+        "http://shachi.akua.xeserv.us:8000",
     ]);
 
     let cors = rocket_cors::CorsOptions {
@@ -68,7 +69,7 @@ fn main() -> Result<()> {
         }))
         .mount("/metrics", prometheus)
         .mount(
-            "/login/gitea",
+            "/",
             routes![wellknown::botinfo, wellknown::robots, wellknown::security],
         )
         .mount("/login/gitea", routes![gitea::callback, gitea::login])

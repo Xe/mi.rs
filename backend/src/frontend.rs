@@ -16,6 +16,11 @@ fn frontend() -> App {
     }
 }
 
+#[get("/login")]
+fn login() -> App {
+    frontend()
+}
+
 #[derive(Template)]
 #[template(path = "notfound.html")]
 struct NotFound {
@@ -40,6 +45,6 @@ pub fn fairing() -> AdHoc {
     AdHoc::on_attach("frontend integration", |rocket| {
         Ok(rocket
             .register(catchers![not_found])
-            .mount("/", routes![frontend, gruvbox]))
+            .mount("/", routes![frontend, gruvbox, login]))
     })
 }

@@ -37,6 +37,9 @@ view { tokenData, front } =
                         , br [] []
                         , text "Issuer: "
                         , text data.iss
+                        , br [] []
+                        , text "Audience: "
+                        , text data.aud
                         ]
                     ]
                  ]

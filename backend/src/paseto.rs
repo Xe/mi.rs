@@ -72,6 +72,40 @@ impl<'a, 'r> FromRequest<'a, 'r> for Token {
     fn from_request(request: &'a Request<'r>) -> request::Outcome<Self, Self::Error> {
         let keys: Vec<_> = request.headers().get("authorization").collect();
         match keys.len() {
+            0 => {
+                let cookies = request.cookies();
+                let tok = cookies.get("token");
+                match tok {
+                    None => Outcome::Failure((Status::Unauthorized, Error::NoPasetoInRequest)),
+                    Some(cook) => {
+                        let tok = cook.value().to_string();
+
+                        let paseto_key = request.guard::<State<PasetoPublicKey>>().unwrap();
+
+                        match validate_public_token(&tok, None, &paseto_key) {
+                            Ok(val) => {
+                                let tok: Token = serde_json::from_value(val).unwrap();
+                                info!(
+                                    id = &tok.jti[..],
+                                    iss = &tok.iss[..],
+                                    sub = &tok.sub[..],
+                                    aud = &tok.aud[..],
+                                    "token used (cookie)"
+                                );
+
+                                Outcome::Success(tok)
+                            }
+                            Err(why) => {
+                                error!("paseto error: {}", why);
+                                Outcome::Failure((
+                                    Status::Unauthorized,
+                                    Error::PasetoValidationError(format!("{}", why)),
+                                ))
+                            }
+                        }
+                    }
+                }
+            }
             1 => {
                 let tok = keys[0];
                 let paseto_key = request.guard::<State<PasetoPublicKey>>().unwrap();
