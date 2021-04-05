@@ -20,7 +20,7 @@ view model =
                 [ p []
                     [ text "Unauthorized access is prohibited. See "
                     , a [ href "/login/gitea" ] [ text "here" ]
-                    , text "to get a secret code."
+                    , text " to get a secret code."
                     ]
                 , input
                     [ placeholder "API Token"
