@@ -62,11 +62,11 @@ type Msg
     | ClearError
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd msg )
-init _ url key =
+init : Maybe String -> Url -> Nav.Key -> ( Model, Cmd msg )
+init token url key =
     ( { navKey = key
       , route = UrlParser.parse routeParser url
-      , token = Nothing
+      , token = token
       , tokenData = Nothing
       , error = Nothing
       , front = Nothing

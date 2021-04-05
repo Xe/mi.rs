@@ -7,7 +7,7 @@ use crate::{
 };
 use diesel::prelude::*;
 use rocket::{
-    http::{Cookie, Cookies, SameSite},
+    http::{Cookie, Cookies},
     response::Redirect,
     State,
 };
@@ -84,11 +84,7 @@ pub fn callback(
     )
     .map_err(|why| Error::OldUReq(format!("{}", why)))?;
 
-    cookies.add(
-        Cookie::build("token", tok.clone())
-            .same_site(SameSite::Lax)
-            .finish(),
-    );
+    cookies.add(Cookie::build("token", tok.clone()).path("/").finish());
 
     Ok(tok)
 }

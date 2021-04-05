@@ -171,7 +171,7 @@ view model =
                 ]
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
     Browser.application
         { view = view

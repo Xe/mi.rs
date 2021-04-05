@@ -14,8 +14,16 @@
             <div id="app">{{ message }}</div>
             <script src="/static/elm.js"></script>
             <script>
+             let cookieValue = null;
+             if (document.cookie != "" && document.cookie.includes("token=")) {
+                 cookieValue = document.cookie
+                     .split('; ')
+                     .find(row => row.startsWith('token='))
+                     .split('=')[1];
+             }
              var app = Elm.Main.init({
-                 node: document.getElementById("app")
+                 node: document.getElementById("app"),
+                 flags: cookieValue
              });
             </script>
             <noscript>
