@@ -24,7 +24,7 @@ pub struct Client {
 
 impl Client {
     pub fn new(username: String, password: String, community: String) -> Result<Client> {
-        let resp = ureq::post("https://lemmy.ml/api/v2/user/login")
+        let resp = ureq::post("https://lemmy.ml/api/v3/user/login")
             .set("User-Agent", crate::APPLICATION_NAME)
             .send_json(serde_json::to_value(Login {
                 username_or_email: username,
@@ -33,7 +33,7 @@ impl Client {
 
         let lr: LoginResponse = resp.into_json()?;
 
-        let resp = ureq::get("https://lemmy.ml/api/v2/community")
+        let resp = ureq::get("https://lemmy.ml/api/v3/community")
             .set("User-Agent", crate::APPLICATION_NAME)
             .query("auth", &lr.jwt.clone())
             .query("name", &community)
@@ -60,7 +60,7 @@ impl Client {
     }
 
     pub fn post(&self, url: String, title: String) -> Result<post::CreatePostResponse> {
-        ureq::post("https://lemmy.ml/api/v2/post")
+        ureq::post("https://lemmy.ml/api/v3/post")
             .set("User-Agent", crate::APPLICATION_NAME)
             .send_json(serde_json::to_value(post::CreatePost {
                 name: title,

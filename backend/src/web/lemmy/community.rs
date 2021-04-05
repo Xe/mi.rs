@@ -18,7 +18,6 @@ pub struct Community {
     pub name: String,
     pub title: String,
     pub description: Option<String>,
-    pub category_id: i32,
     pub creator_id: i32,
     pub removed: bool,
     pub published: String,
