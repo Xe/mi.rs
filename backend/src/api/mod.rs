@@ -1,5 +1,4 @@
 use crate::{models, paseto, schema, web, MainDatabase};
-use ::paseto::PasetoBuilder;
 use diesel::prelude::*;
 use rocket::{
     data::{self, FromDataSimple},
@@ -11,13 +10,13 @@ use rocket::{
     Response, State,
 };
 use rocket_contrib::json::Json;
-use rusty_ulid::generate_ulid_string;
 use std::io::Read;
 
 pub mod indieauth;
 pub mod package_tracking;
 pub mod posse;
 pub mod switch;
+pub mod token;
 pub mod webmention;
 
 #[get("/members")]
@@ -29,35 +28,6 @@ pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<mo
         .map_err(Error::Database)?;
 
     Ok(Json(results))
-}
-
-#[get("/token/info")]
-pub fn token_info(tok: paseto::Token) -> Json<paseto::Token> {
-    Json(tok)
-}
-
-#[post("/token/mint?<aud>&<sub>")]
-#[instrument(skip(kp), err)]
-pub fn token_mint(
-    tok: paseto::Token,
-    kp: State<paseto::Keypair>,
-    aud: String,
-    sub: String,
-) -> Result<String> {
-    let kp = kp.inner().ed25519_keypair();
-
-    PasetoBuilder::new()
-        .set_ed25519_key(kp)
-        .set_issued_at(None)
-        .set_issuer(format!("api call from {}", tok.sub))
-        .set_audience(aud)
-        .set_jti(generate_ulid_string())
-        .set_subject(sub)
-        .build()
-        .map_err(|why| {
-            error!("can't make paseto: {}", why);
-            Error::PasetoCreationError(format!("{}", why))
-        })
 }
 
 #[post("/tweet", data = "<body>")]

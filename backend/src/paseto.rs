@@ -56,7 +56,7 @@ impl Keypair {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Token {
     pub jti: String,
     pub sub: String,

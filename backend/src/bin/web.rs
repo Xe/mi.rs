@@ -9,10 +9,12 @@ use color_eyre::eyre::Result;
 use rocket::{fairing::AdHoc, http::Method};
 use rocket_contrib::helmet::SpaceHelmet;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use rocket_oauth2::OAuth2;
 use rocket_prometheus::PrometheusMetrics;
 
 use ::mi::{
-    api, frontend, paseto, rocket_trace::*, web::*, wellknown, MainDatabase, APPLICATION_NAME,
+    api, frontend, gitea, paseto, rocket_trace::*, web::*, wellknown, Gitea, MainDatabase,
+    APPLICATION_NAME,
 };
 
 fn main() -> Result<()> {
@@ -54,7 +56,8 @@ fn main() -> Result<()> {
         .attach(PluralKit::fairing())
         .attach(SwitchCounter::fairing())
         .attach(Twitter::fairing())
-        .attach(Lemmy::fairing())
+        .attach(OAuth2::<Gitea>::fairing("gitea"))
+        //.attach(Lemmy::fairing())
         .attach(AdHoc::on_launch("systemd readiness", |_| {
             if let Ok(ref mut n) = sdnotify::SdNotify::from_env() {
                 let _ = n
@@ -65,9 +68,10 @@ fn main() -> Result<()> {
         }))
         .mount("/metrics", prometheus)
         .mount(
-            "/",
+            "/login/gitea",
             routes![wellknown::botinfo, wellknown::robots, wellknown::security],
         )
+        .mount("/login/gitea", routes![gitea::callback, gitea::login])
         .mount(
             "/api",
             routes![
@@ -83,13 +87,13 @@ fn main() -> Result<()> {
                 api::switch::get,
                 api::switch::list,
                 api::switch::switch,
+                api::token::info,
+                api::token::mint,
                 api::webmention::accept,
                 api::webmention::get,
                 api::webmention::lookup_target,
                 api::webmention::list,
                 api::get_members,
-                api::token_info,
-                api::token_mint,
                 api::tweet,
                 api::toot,
             ],

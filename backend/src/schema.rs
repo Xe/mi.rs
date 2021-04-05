@@ -6,6 +6,15 @@ table! {
 }
 
 table! {
+    gitea_tokens (id) {
+        id -> Text,
+        user_id -> Text,
+        access_token -> Text,
+        refresh_token -> Text,
+    }
+}
+
+table! {
     indieauth_codes (code) {
         code -> Text,
         client_id -> Text,
@@ -86,6 +95,7 @@ joinable!(switches -> members (member_id));
 
 allow_tables_to_appear_in_same_query!(
     blogposts,
+    gitea_tokens,
     indieauth_codes,
     members,
     orangeconnex_packages,

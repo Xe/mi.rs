@@ -955,6 +955,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-sync-rustls"
+version = "0.3.0-rc.17"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cb014c4ea00486e2b62860b5e15229d37516d4924177218beafbf46583de3ab"
+dependencies = [
+ "hyper",
+ "rustls 0.17.0",
+ "webpki",
+ "webpki-roots 0.19.0",
+]
+
+[[package]]
 name = "idna"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1240,6 +1252,7 @@ dependencies = [
  "rocket",
  "rocket_contrib",
  "rocket_cors",
+ "rocket_oauth2",
  "rocket_prometheus",
  "rusty_ulid",
  "scraper",
@@ -2115,6 +2128,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rocket_oauth2"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee8d685f84c5873e507b97325f08fb8797c7e146fc068ee1d4aac56942d365a6"
+dependencies = [
+ "base64 0.12.3",
+ "hyper",
+ "hyper-sync-rustls",
+ "log 0.4.14",
+ "rand 0.7.3",
+ "rocket",
+ "serde_json",
+ "url 2.2.1",
+]
+
+[[package]]
 name = "rocket_prometheus"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2156,6 +2185,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 dependencies = [
  "semver",
+]
+
+[[package]]
+name = "rustls"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0d4a31f5d68413404705d6982529b0e11a9aacd4839d1d6222ee3b8cb4015e1"
+dependencies = [
+ "base64 0.11.0",
+ "log 0.4.14",
+ "ring",
+ "sct",
+ "webpki",
 ]
 
 [[package]]
@@ -2960,12 +3002,12 @@ dependencies = [
  "log 0.4.14",
  "once_cell",
  "qstring",
- "rustls",
+ "rustls 0.19.0",
  "serde",
  "serde_json",
  "url 2.2.1",
  "webpki",
- "webpki-roots",
+ "webpki-roots 0.21.0",
 ]
 
 [[package]]
@@ -2979,12 +3021,12 @@ dependencies = [
  "encoding_rs",
  "log 0.4.14",
  "once_cell",
- "rustls",
+ "rustls 0.19.0",
  "serde",
  "serde_json",
  "url 2.2.1",
  "webpki",
- "webpki-roots",
+ "webpki-roots 0.21.0",
 ]
 
 [[package]]
@@ -3129,6 +3171,15 @@ checksum = "b8e38c0608262c46d4a56202ebabdeb094cef7e560ca7a226c6bf055188aa4ea"
 dependencies = [
  "ring",
  "untrusted",
+]
+
+[[package]]
+name = "webpki-roots"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f8eff4b7516a57307f9349c64bf34caa34b940b66fed4b2fb3136cb7386e5739"
+dependencies = [
+ "webpki",
 ]
 
 [[package]]

@@ -37,3 +37,9 @@ account = "..."
 username = "..."
 password = "..."
 community = "..."
+
+[global.oauth.gitea]
+provider = { auth_uri = "https://tulpa.dev/login/oauth/authorize", token_uri = "https://tulpa.dev/login/oauth/access_token" }
+client_id = "..."
+client_secret = "..."
+redirect_uri = "http://localhost:8000/login/gitea/callback"

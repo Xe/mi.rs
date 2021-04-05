@@ -120,3 +120,12 @@ impl OrangeConnexTrace {
         }
     }
 }
+
+#[derive(Queryable, Debug, Clone, Insertable)]
+#[table_name = "gitea_tokens"]
+pub struct GiteaToken {
+    pub id: String,
+    pub user_id: String,
+    pub access_token: String,
+    pub refresh_token: String,
+}

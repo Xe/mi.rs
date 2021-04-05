@@ -20,6 +20,7 @@ pub const APPLICATION_NAME: &str = concat!(
 
 pub mod api;
 pub mod frontend;
+pub mod gitea;
 pub mod models;
 pub mod paseto;
 pub mod rocket_trace;
@@ -29,6 +30,8 @@ pub mod wellknown;
 
 #[database("main_data")]
 pub struct MainDatabase(SqliteConnection);
+
+pub struct Gitea;
 
 pub fn establish_connection() -> SqliteConnection {
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
