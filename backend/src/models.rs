@@ -110,7 +110,7 @@ impl OrangeConnexTrace {
         use rusty_ulid::generate_ulid_string;
         Self {
             id: generate_ulid_string(),
-            tracking_number: tracking_number,
+            tracking_number,
             description: t.event_desc,
             city: t.opr_city,
             country: t.opr_country,
@@ -119,6 +119,23 @@ impl OrangeConnexTrace {
             ts: t.opr_timestamp.try_into().unwrap_or(1337),
         }
     }
+}
+
+#[derive(Queryable, Debug, Clone, Insertable)]
+#[table_name = "indieauth_codes"]
+pub struct IndieauthCode {
+    pub code: String,
+    pub client_id: String,
+    pub redirect_uri: String,
+    pub state: String,
+    pub response_type: String,
+    pub authorized: bool,
+}
+
+#[derive(AsChangeset)]
+#[table_name = "indieauth_codes"]
+pub struct UpdateIndieauthCodeAuthorized {
+    pub authorized: bool,
 }
 
 #[derive(Queryable, Debug, Clone, Insertable)]

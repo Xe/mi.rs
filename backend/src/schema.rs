@@ -21,6 +21,7 @@ table! {
         redirect_uri -> Text,
         state -> Text,
         response_type -> Text,
+        authorized -> Bool,
     }
 }
 

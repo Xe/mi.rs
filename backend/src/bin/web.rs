@@ -77,6 +77,8 @@ fn main() -> Result<()> {
             "/api",
             routes![
                 api::indieauth::auth,
+                api::indieauth::authorized,
+                api::indieauth::send_code,
                 api::package_tracking::orangeconnex::list,
                 api::package_tracking::orangeconnex::recieved,
                 api::package_tracking::orangeconnex::status,

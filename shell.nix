@@ -15,7 +15,7 @@ in pkgs.mkShell rec {
     openssl
     cmake
     zlib
-    sqlite
+    sqliteInteractive
     libsodium
 
     # tools

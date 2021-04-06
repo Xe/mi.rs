@@ -14,7 +14,13 @@
                 <a href="/">Mi</a>
             </nav>
             <h1>Authorization for {{ client_id }}</h1>
-            <p></p>
+            <p>{{ client_id }} asked for authentication as {{ me }}. If you do not know what this is, please close this tab.</p>
+            <form action="/api/auth/authorized" method="GET">
+                <input type="hidden" name="code" value="{{ code }}">
+                <input type="submit" value="Authorize">
+            </form>
+            <br />
+            <br />
             <a href="/">Go home</a>
         </main>
     </body>
