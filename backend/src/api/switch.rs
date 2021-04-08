@@ -1,9 +1,5 @@
 use super::{Error, Result, StringBody};
-use crate::{
-    models, paseto, schema,
-    web::{PluralKit, SwitchCounter},
-    MainDatabase,
-};
+use crate::{models, paseto, schema, web::PluralKit, MainDatabase};
 use chrono::prelude::*;
 use diesel::prelude::*;
 use rocket::State;
@@ -105,11 +101,10 @@ pub fn current_front_text(conn: MainDatabase, tok: paseto::Token) -> Result<Stri
 }
 
 #[post("/switches/switch", data = "<who>")]
-#[instrument(skip(conn, sc, pk), err)]
+#[instrument(skip(conn, pk), err)]
 pub fn switch(
     conn: MainDatabase,
     who: StringBody,
-    sc: State<SwitchCounter>,
     pk: State<PluralKit>,
     tok: paseto::Token,
 ) -> Result<String> {
@@ -166,7 +161,6 @@ pub fn switch(
     info!(from = &member.cmene[..], to = &to.cmene[..], "switched");
 
     pk.switch(to.cmene.clone())?;
-    sc.switch(to.cmene.clone())?;
 
     Ok(to.cmene)
 }
