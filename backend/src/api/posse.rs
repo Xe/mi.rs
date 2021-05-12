@@ -60,9 +60,14 @@ pub fn read_jsonfeed(url: String) -> WebResult<Jsonfeed> {
     Ok(resp.into_json()?)
 }
 
-#[instrument(skip(dw, tw, ma, le), err)]
-fn posse(item: Item, dw: &DiscordWebhook, tw: &Twitter, ma: &Mastodon, le: &Lemmy) -> WebResult {
-    le.post(item.url.clone(), item.title.clone())?;
+#[instrument(skip(dw, tw, ma/*, le*/), err)]
+fn posse(
+    item: Item,
+    dw: &DiscordWebhook,
+    tw: &Twitter,
+    ma: &Mastodon, /*, le: &Lemmy*/
+) -> WebResult {
+    //le.post(item.url.clone(), item.title.clone())?;
 
     let message = item.render();
 
@@ -76,29 +81,29 @@ fn posse(item: Item, dw: &DiscordWebhook, tw: &Twitter, ma: &Mastodon, le: &Lemm
 pub static BLOG_FEED_URL: &'static str = "https://christine.website/blog.json";
 
 #[post("/posse", format = "json", data = "<item>")]
-#[instrument(skip(dw, tw, ma, le), err)]
+#[instrument(skip(dw, tw, ma/*, le*/), err)]
 pub fn notify(
     item: Json<Item>,
     tok: paseto::Token,
     dw: State<DiscordWebhook>,
     tw: State<Twitter>,
     ma: State<Mastodon>,
-    le: State<Lemmy>,
+    //le: State<Lemmy>,
 ) -> Result {
-    posse(item.into_inner(), &dw, &tw, &ma, &le)?;
+    posse(item.into_inner(), &dw, &tw, &ma /*, &le*/)?;
 
     Ok(())
 }
 
 #[post("/blog/refresh")]
-#[instrument(skip(conn, dw, tw, ma, le), err)]
+#[instrument(skip(conn, dw, tw, ma/*, le*/), err)]
 pub fn refresh_blog(
     tok: paseto::Token,
     conn: MainDatabase,
     dw: State<DiscordWebhook>,
     tw: State<Twitter>,
     ma: State<Mastodon>,
-    le: State<Lemmy>,
+    //le: State<Lemmy>,
 ) -> Result {
     use schema::blogposts::dsl::blogposts;
     let feed = read_jsonfeed(BLOG_FEED_URL.to_string())?;
@@ -116,7 +121,7 @@ pub fn refresh_blog(
                         post
                     })
                     .execute(&*conn)?;
-                posse(item, &dw, &tw, &ma, &le)?
+                posse(item, &dw, &tw, &ma /*, &le*/)?
             }
         }
     }

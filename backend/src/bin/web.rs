@@ -58,7 +58,7 @@ fn main() -> Result<()> {
         .attach(SwitchCounter::fairing())
         .attach(Twitter::fairing())
         .attach(OAuth2::<Gitea>::fairing("gitea"))
-        .attach(Lemmy::fairing())
+        //.attach(Lemmy::fairing())
         .attach(AdHoc::on_launch("systemd readiness", |_| {
             if let Ok(ref mut n) = sdnotify::SdNotify::from_env() {
                 let _ = n
