@@ -1,7 +1,7 @@
 use super::Result;
 use crate::{
     models, paseto, schema,
-    web::{DiscordWebhook, Lemmy, Mastodon, Result as WebResult, Twitter},
+    web::{DiscordWebhook, Lemmy, Mastodon, Result as WebResult, Twitter, IRC},
     MainDatabase,
 };
 use diesel::prelude::*;
@@ -60,18 +60,20 @@ pub fn read_jsonfeed(url: String) -> WebResult<Jsonfeed> {
     Ok(resp.into_json()?)
 }
 
-#[instrument(skip(dw, tw, ma/*, le*/), err)]
+#[instrument(skip(dw, tw, ma, irc/*, le*/), err)]
 fn posse(
     item: Item,
     dw: &DiscordWebhook,
     tw: &Twitter,
-    ma: &Mastodon, /*, le: &Lemmy*/
+    ma: &Mastodon,
+    irc: &IRC, /*, le: &Lemmy*/
 ) -> WebResult {
     //le.post(item.url.clone(), item.title.clone())?;
 
     let message = item.render();
 
     dw.send(message.clone())?;
+    irc.send(message.clone())?;
     tw.tweet(message.clone())?;
     ma.toot(message.clone())?;
 
@@ -81,28 +83,30 @@ fn posse(
 pub static BLOG_FEED_URL: &'static str = "https://christine.website/blog.json";
 
 #[post("/posse", format = "json", data = "<item>")]
-#[instrument(skip(dw, tw, ma/*, le*/), err)]
+#[instrument(skip(dw, tw, ma, irc/*, le*/), err)]
 pub fn notify(
     item: Json<Item>,
     tok: paseto::Token,
     dw: State<DiscordWebhook>,
     tw: State<Twitter>,
     ma: State<Mastodon>,
+    irc: State<IRC>,
     //le: State<Lemmy>,
 ) -> Result {
-    posse(item.into_inner(), &dw, &tw, &ma /*, &le*/)?;
+    posse(item.into_inner(), &dw, &tw, &ma, &irc /*, &le*/)?;
 
     Ok(())
 }
 
 #[post("/blog/refresh")]
-#[instrument(skip(conn, dw, tw, ma/*, le*/), err)]
+#[instrument(skip(conn, dw, tw, ma, irc/*, le*/), err)]
 pub fn refresh_blog(
     tok: paseto::Token,
     conn: MainDatabase,
     dw: State<DiscordWebhook>,
     tw: State<Twitter>,
     ma: State<Mastodon>,
+    irc: State<IRC>,
     //le: State<Lemmy>,
 ) -> Result {
     use schema::blogposts::dsl::blogposts;
@@ -121,7 +125,7 @@ pub fn refresh_blog(
                         post
                     })
                     .execute(&*conn)?;
-                posse(item, &dw, &tw, &ma /*, &le*/)?
+                posse(item, &dw, &tw, &ma, &irc /*, &le*/)?
             }
         }
     }

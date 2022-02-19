@@ -1,6 +1,7 @@
 pub mod bridgy;
 pub mod canada_weather;
 pub mod discord_webhook;
+pub mod irc;
 pub mod lemmy;
 pub mod mastodon;
 pub mod orange_connex;
@@ -9,6 +10,7 @@ pub mod switchcounter;
 pub mod twitter;
 
 pub use discord_webhook::Client as DiscordWebhook;
+pub use irc::Client as IRC;
 pub use lemmy::Client as Lemmy;
 pub use mastodon::Client as Mastodon;
 pub use pluralkit::Client as PluralKit;

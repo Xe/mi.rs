@@ -52,6 +52,7 @@ fn main() -> Result<()> {
         .attach(MainDatabase::fairing())
         .attach(RequestId {})
         .attach(paseto::ed25519_keypair())
+        .attach(IRC::fairing())
         .attach(DiscordWebhook::fairing())
         .attach(Mastodon::fairing())
         .attach(PluralKit::fairing())
