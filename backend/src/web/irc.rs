@@ -29,13 +29,15 @@ impl Client {
 
     pub fn fairing() -> AdHoc {
         AdHoc::on_attach("IRC webhook", |rocket| {
-            let webhook_url = rocket.config().get_string("discord_webhook").unwrap();
+            let webhook_url = rocket.config().get_string("irc_webhook").unwrap();
             Ok(rocket.manage(Client::new(webhook_url)))
         })
     }
 
     #[instrument(skip(self), err)]
     pub fn send(&self, body: String) -> Result<()> {
+        let body = body.replace("\n", " - ");
+
         ureq::post(&self.url)
             .set("User-Agent", crate::APPLICATION_NAME)
             .send_json(serde_json::to_value(Body::new(body))?)
