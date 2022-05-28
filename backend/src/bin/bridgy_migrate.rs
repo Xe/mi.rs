@@ -20,7 +20,7 @@ fn main() -> Result<()> {
         .load::<models::WebMention>(&conn)?
         .into_iter()
         .for_each(|wm| {
-            if !wm.source_url.contains("https://brid-gy.appspot.com") {
+            if !wm.source_url.contains("https://brid.gy") {
                 return;
             }
 

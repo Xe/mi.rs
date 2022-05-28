@@ -36,9 +36,6 @@ impl WebMention {
             _ => return Err(Error::InvalidWebMention("invalid source scheme".into())),
         }
 
-        u.host_str()
-            .ok_or(Error::InvalidWebMention("no host found in target".into()))?;
-
         let u: Url = Url::parse(&self.target)?;
         match u.scheme() {
             "http" | "https" => {}
@@ -49,7 +46,7 @@ impl WebMention {
             .host_str()
             .ok_or(Error::InvalidWebMention("no host found in target".into()))?
         {
-            "christine.website" | "cetacean.club" => {}
+            "xeiaso.net" | "christine.website" | "cetacean.club" => {}
             _ => return Err(Error::InvalidWebMention("invalid target host".into())),
         }
 
@@ -98,7 +95,7 @@ impl<'a> Responder<'a> for models::WebMention {
         Response::build()
             .raw_header(
                 "Location",
-                format!("https://mi.christine.website/api/webmention/{}", self.id),
+                format!("https://mi.within.website/api/webmention/{}", self.id),
             )
             .status(Status::Created)
             .ok()
@@ -216,7 +213,7 @@ pub fn bridgy_expand(conn: MainDatabase, wm: models::WebMention) -> Result {
     use crate::web::bridgy::parse;
     use schema::webmentions::dsl::*;
 
-    if !wm.source_url.contains("https://brid-gy.appspot.com") {
+    if !wm.source_url.contains("https://brid.gy") {
         return Ok(());
     }
 
