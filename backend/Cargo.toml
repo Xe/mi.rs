@@ -37,7 +37,6 @@ thiserror = "1"
 tracing = "0.1"
 tracing-log = "0.1"
 tracing-subscriber = "0.2"
-twapi-ureq = "0.1.5"
 ureq = { version = "2", features = ["json", "charset"] }
 url = "2"
 

@@ -57,7 +57,6 @@ fn main() -> Result<()> {
         .attach(Mastodon::fairing())
         .attach(PluralKit::fairing())
         .attach(SwitchCounter::fairing())
-        .attach(Twitter::fairing())
         .attach(OAuth2::<Gitea>::fairing("gitea"))
         //.attach(Lemmy::fairing())
         .attach(AdHoc::on_launch("systemd readiness", |_| {
@@ -98,7 +97,6 @@ fn main() -> Result<()> {
                 api::webmention::lookup_target,
                 api::webmention::list,
                 api::get_members,
-                api::tweet,
                 api::toot,
             ],
         )

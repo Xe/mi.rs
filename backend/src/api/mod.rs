@@ -30,14 +30,6 @@ pub fn get_members(tok: paseto::Token, conn: MainDatabase) -> Result<Json<Vec<mo
     Ok(Json(results))
 }
 
-#[post("/tweet", data = "<body>")]
-#[instrument(skip(tw), err)]
-pub fn tweet(body: StringBody, tw: State<web::twitter::Client>, tok: paseto::Token) -> Result {
-    tw.tweet(body.unwrap())?;
-
-    Ok(())
-}
-
 #[post("/toot", data = "<body>")]
 #[instrument(skip(ma), err)]
 pub fn toot(body: StringBody, ma: State<web::mastodon::Client>, tok: paseto::Token) -> Result {
